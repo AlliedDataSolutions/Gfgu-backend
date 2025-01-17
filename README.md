@@ -5,13 +5,20 @@ A multivendor app. This is the backend repo
 ## Installation
 
 ### Requirement
-⋅⋅* Node
-⋅⋅* Virtual studio code
+* Node
+* Virtual studio code
 
-### Run on local
+### Run app
 
 ```javascript
+// for development
 npm run dev
+
+// build for production
+npm run build
+
+// run production
+npm start
 ```
 
 ## Project structure
@@ -72,8 +79,8 @@ project-root/
 
 Each feature gets its own folder, containing everything it needs to function:
 
-⋅⋅* Controller: Handles requests and responses for the feature.
-⋅⋅* Routes: Defines routes/endpoints for the feature.
-⋅⋅* Service: Contains the business logic.
-⋅⋅* Model: Defines database schema for the feature.
-⋅⋅* Middleware: Feature-specific middleware.
+* Controller: Handles requests and responses for the feature.
+* Routes: Defines routes/endpoints for the feature.
+* Service: Contains the business logic.
+* Model: Defines database schema for the feature.
+* Middleware: Feature-specific middleware.
