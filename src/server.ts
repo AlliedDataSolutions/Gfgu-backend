@@ -3,6 +3,8 @@ import cors from "cors";
 import reflect from "reflect-metadata";
 import dotenv from "dotenv";
 import { initializeDatabase } from './config/db';
+import authRoute from './features/auth/authRoute'
+import userRoute from './features/user/userRoute'
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -25,8 +27,6 @@ initializeDatabase()
   });
 
 // Routes
-app.get("/", (req, res) => {
-    res.status(200).json({
-        message: "home here"
-    })
-})
+app.use('/api/auth', authRoute)
+app.use("/api/user", userRoute)
+

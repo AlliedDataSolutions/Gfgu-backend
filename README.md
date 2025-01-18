@@ -10,7 +10,7 @@ A multivendor app. This is the backend repo
 
 ### Run app
 
-Make sure to have docker running on you computer, then follow the code below
+Make sure to have docker running on you computer, then run the code below
 
 ```javascript
 // Build docker image. Don't forget the period
