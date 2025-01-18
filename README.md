@@ -10,16 +10,22 @@ A multivendor app. This is the backend repo
 
 ### Run app
 
+Make sure to have docker running on you computer, then follow the code below
+
 ```javascript
-// for development
-npm run dev
+// Build docker image. Don't forget the period
+docker build -t gfgu-app .
 
-// build for production
-npm run build
+// check if gfgu image works
+docker images
 
-// run production
-npm start
+// Starts or restarts your services
+docker compose up
+
 ```
+
+server should be running on: 
+http://localhost:13000/
 
 ## Project structure
 Project is feature-base structured. Here is an example 
