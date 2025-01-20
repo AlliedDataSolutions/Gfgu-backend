@@ -19,7 +19,7 @@ export class User {
     isConfirmed!: boolean
 
     @Column({nullable: true})
-    phoneNumner?: string
+    phoneNumber!: string
 
     @CreateDateColumn()
     createdDate!: Date
