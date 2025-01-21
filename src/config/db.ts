@@ -1,6 +1,10 @@
 import { DataSource } from "typeorm";
 import { Credential } from "../features/auth/credential";
 import { User } from "../features/user/user";
+import { Product } from "../features/product/productModel";
+import { ProductImage } from "../features/product/ProductImage";
+import { Image } from "../features/product/ImageModel";
+
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -11,7 +15,7 @@ const AppDataSource = new DataSource({
     database: "db123",
     synchronize: true, //set to false in production
     logging: true,
-    entities: [Credential, User]
+    entities: [Credential, User, Product, ProductImage, Image]
 })
 
 let isInitialized = false;
