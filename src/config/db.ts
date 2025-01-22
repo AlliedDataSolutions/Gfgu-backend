@@ -1,6 +1,9 @@
 import { DataSource } from "typeorm";
 import { Credential } from "../features/auth/credential";
 import { User } from "../features/user/user";
+// import { OrderLine } from "../features/Order/OrderLine";
+import { Payment } from "../features/Payment/payment";
+import { Order } from "../features/Order/order";
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -11,7 +14,7 @@ const AppDataSource = new DataSource({
     database: "db123",
     synchronize: true, //set to false in production
     logging: true,
-    entities: [Credential, User]
+   // entities: [Credential, User,Payment, Order, OrderLine]
 })
 
 let isInitialized = false;
