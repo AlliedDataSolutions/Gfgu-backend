@@ -5,6 +5,8 @@ import { Payment } from "../features/payment";
 import { Order } from "../features/order";
 import { Product, ProductImage } from "../features/product";
 import { Image } from "../features/image";
+import {Category} from "../features/product/Category";
+import {ProductCategory} from "../features/product/ProductCategory";
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -15,7 +17,7 @@ const AppDataSource = new DataSource({
   database: "db123",
   synchronize: true, //set to false in production
   logging: true,
-  entities: [Credential, User, Payment, Order, Product, ProductImage, Image],
+  entities: [Credential, User, Payment, Order, Product, ProductImage, Image, Category, ProductCategory],
 });
 
 let isInitialized = false;
