@@ -4,7 +4,9 @@ import { User } from "../features/user/user";
 import { Product } from "../features/product/productModel";
 import { ProductImage } from "../features/product/ProductImage";
 import { Image } from "../features/product/ImageModel";
-
+import {Category} from "../features/product/Category";
+import {ProductCategory} from "../features/product/ProductCategory";
+import {Product} from "../features/product/Product";
 
 
 const AppDataSource = new DataSource({
