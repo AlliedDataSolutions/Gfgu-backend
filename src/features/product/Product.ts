@@ -7,10 +7,10 @@ import {
     UpdateDateColumn,
     JoinColumn
 } from "typeorm"; 
-import { Vendor } from "../vendor/Vendor"; // Ensure the location of Vendor is correct
+//import { Vendor } from "../user/vendor"; // Ensure the location of Vendor is correct
 
 @Entity()
-export class Product {
+export class Product2 {
     @PrimaryGeneratedColumn()
     ProductID!: number; // Primary Key Auto Incremented.
 
@@ -37,7 +37,8 @@ export class Product {
 
     //Relationships
     
-    @ManyToOne(() => Vendor)
-    @JoinColumn({ name: "VendorID" })
-    vendor!: Vendor; // Foreign Key from Vendor
+    //Foreign Key to be implemented later.
+    //@ManyToOne(() => Vendor)
+    //@JoinColumn({ name: "VendorID" })
+    //vendor!: Vendor; // Foreign Key from Vendor
 }

@@ -6,7 +6,7 @@ import { ProductImage } from "../features/product/ProductImage";
 import { Image } from "../features/product/ImageModel";
 import {Category} from "../features/product/Category";
 import {ProductCategory} from "../features/product/ProductCategory";
-import {Product} from "../features/product/Product";
+import {Product2} from "../features/product/Product";
 
 
 const AppDataSource = new DataSource({
@@ -18,7 +18,13 @@ const AppDataSource = new DataSource({
     database: "db123",
     synchronize: true, //set to false in production
     logging: true,
-    entities: [Credential, User, Product, ProductImage, Image]
+    entities: [Credential, 
+      User, 
+      Product, 
+      ProductImage, 
+      Image, Category,
+      ProductCategory,
+      Product2]
 })
 
 let isInitialized = false;
