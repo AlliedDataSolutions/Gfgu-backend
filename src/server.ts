@@ -1,10 +1,10 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import reflect from "reflect-metadata";
 import dotenv from "dotenv";
-import { initializeDatabase } from './config/db';
-import authRoute from './features/auth/authRoute'
-import userRoute from './features/user/userRoute'
+import { initializeDatabase } from "./config/db";
+import authRoute from "./features/auth/authRouter";
+import userRoute from "./features/user/userRoute";
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +27,5 @@ initializeDatabase()
   });
 
 // Routes
-app.use('/api/auth', authRoute)
-app.use("/api/user", userRoute)
-
+app.use("/api/auth", authRoute);
+app.use("/api/user", userRoute);

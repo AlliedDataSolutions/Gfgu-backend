@@ -7,7 +7,7 @@ import {
     UpdateDateColumn,
     JoinColumn,
   } from "typeorm";
-  import { Order } from "../Order/order";
+  import { Order } from "../order/order";
   
   @Entity()
   export class Payment {

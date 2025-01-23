@@ -1,32 +1,33 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
-
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 @Entity()
 export class Product {
-    @PrimaryGeneratedColumn("uuid")
-    id!: string
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-    @Column()
-    name!: string
+  @Column()
+  name!: string;
 
-    @Column()
-    lastName!: string
+  @Column()
+  description!: string;
 
-    @Column()
-    description!: string
+  @Column()
+  price!: number;
 
-    @Column()
-    price!: number
+  @Column({ nullable: true })
+  phoneNumber!: string;
 
-    @Column({nullable: true})
-    phoneNumber!: string
+  @Column()
+  stockLevel!: number;
 
-    @Column()
-    stockLevel!: number
+  @CreateDateColumn()
+  createdDate!: Date;
 
-    @CreateDateColumn()
-    createdDate!: Date
-
-    @CreateDateColumn()
-    modifeidDate!: Date
+  @CreateDateColumn()
+  modifeidDate!: Date;
 }

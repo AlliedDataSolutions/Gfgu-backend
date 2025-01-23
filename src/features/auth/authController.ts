@@ -1,6 +1,6 @@
 import { AppDataSource } from "../../config/db";
 import { User } from "../user/user";
-import { Credential } from "./credential";
+import { Credential } from "./credentialModel";
 import { Request, Response } from 'express';
 
 

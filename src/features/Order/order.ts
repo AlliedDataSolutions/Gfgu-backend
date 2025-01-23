@@ -12,7 +12,7 @@ import { OrderStatus } from "./orderStatus";
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")
-  id!: string; 
+  id!: string;
 
   @Column()
   orderDate!: Date;
@@ -26,16 +26,19 @@ export class Order {
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
   totalAmount!: number;
 
-  @Column({ 
+  @Column({
     type: "enum",
     enum: OrderStatus,
-    default: OrderStatus.PENDING
-   })
+    default: OrderStatus.PENDING,
+  })
   status!: OrderStatus;
 
- @ManyToOne(() => User, (user) => user.orders, { nullable: false, onDelete: "CASCADE" })
- user!: User; // Foreign Key referencing User
+  @ManyToOne(() => User, (user) => user.orders, {
+    nullable: false,
+    onDelete: "CASCADE",
+  })
+  user!: User; // Foreign Key referencing User
 
- // @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
- // orderLines!: OrderLine[];
+  // @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
+  // orderLines!: OrderLine[];
 }
