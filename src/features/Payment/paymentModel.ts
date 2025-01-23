@@ -14,7 +14,7 @@ import { PaymentMethod } from "./paymentMethod";
 @Entity()
 export class Payment {
   @PrimaryGeneratedColumn("uuid")
-  id!: string; // Primary Key
+  id!: string; 
 
   @Column({ unique: true })
   transactionId!: string; // Unique ID for each payment transaction

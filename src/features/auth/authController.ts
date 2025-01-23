@@ -1,6 +1,6 @@
 import { AppDataSource } from "../../config/db";
 import { User } from "../user/userModel";
-import { Credential } from "./credentialModel";
+import { Credential, Role } from "../auth";
 import { Request, Response } from "express";
 
 const register = async (req: Request, res: Response) => {
@@ -20,7 +20,7 @@ const register = async (req: Request, res: Response) => {
   const newCredential = credentialRepository.create({
     email: "john.doe@example.com",
     password: "securepassword",
-    role: "customer",
+    role: Role.customer,
     user: savedUser,
   });
 

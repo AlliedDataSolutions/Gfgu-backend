@@ -1,3 +1,3 @@
-export { Payment }  from "./paymentModel";
-export { PaymentStatus } from "./paymentStatus";
-export { PaymentMethod } from "./paymentMethod";
+export *  from "./paymentModel";
+export * from "./paymentStatus";
+export * from "./paymentMethod";

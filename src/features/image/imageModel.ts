@@ -1,9 +1,13 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Product } from "../product";
 
 @Entity()
 export class Image {
   @PrimaryGeneratedColumn("uuid")
-  imageId!: string; 
+  id!: string; 
+
+  @ManyToMany(() => Product, (product) => product.images)
+  products?: Product[];
 
   @Column()
   url!: string; 

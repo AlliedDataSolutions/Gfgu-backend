@@ -3,7 +3,7 @@ import { Credential } from "../features/auth/credentialModel";
 import { User } from "../features/user/userModel";
 import { Payment } from "../features/payment";
 import { Order } from "../features/order";
-import { Product, ProductImage, Category } from "../features/product";
+import { Product, Category } from "../features/product";
 import { Image } from "../features/image";
 
 const AppDataSource = new DataSource({
@@ -15,7 +15,7 @@ const AppDataSource = new DataSource({
   database: "db123",
   synchronize: true, //set to false in production
   logging: true,
-  entities: [Credential, User, Payment, Order, Product, ProductImage, Image, Category, ProductCategory],
+  entities: [Credential, User, Payment, Order, Product, Image, Category],
 });
 
 let isInitialized = false;
