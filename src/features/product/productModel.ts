@@ -14,13 +14,10 @@ export class Product {
   name!: string;
 
   @Column()
-  description!: string;
+  description?: string;
 
   @Column()
   price!: number;
-
-  @Column({ nullable: true })
-  phoneNumber!: string;
 
   @Column()
   stockLevel!: number;

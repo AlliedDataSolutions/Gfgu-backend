@@ -3,10 +3,8 @@ import { Credential } from "../features/auth/credentialModel";
 import { User } from "../features/user/userModel";
 import { Payment } from "../features/payment";
 import { Order } from "../features/order";
-import { Product, ProductImage } from "../features/product";
+import { Product, ProductImage, Category } from "../features/product";
 import { Image } from "../features/image";
-import {Category} from "../features/product/Category";
-import {ProductCategory} from "../features/product/ProductCategory";
 
 const AppDataSource = new DataSource({
   type: "postgres",

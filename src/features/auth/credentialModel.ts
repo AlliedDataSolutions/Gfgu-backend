@@ -16,7 +16,7 @@ export class Credential {
   @Column({
     type: "enum",
     enum: Role,
-    default: Role.Customer,
+    default: Role.customer,
   })
   role!: Role;
 

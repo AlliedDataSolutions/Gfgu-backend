@@ -29,7 +29,7 @@ export class Order {
   @Column({
     type: "enum",
     enum: OrderStatus,
-    default: OrderStatus.PENDING,
+    default: OrderStatus.pending,
   })
   status!: OrderStatus;
 

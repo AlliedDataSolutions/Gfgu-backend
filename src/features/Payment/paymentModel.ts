@@ -8,6 +8,8 @@ import {
   JoinColumn,
 } from "typeorm";
 import { Order } from "../order/orderModel";
+import { PaymentStatus } from "./paymentStatus";
+import { PaymentMethod } from "./paymentMethod";
 
 @Entity()
 export class Payment {
@@ -18,16 +20,19 @@ export class Payment {
   transactionId!: string; // Unique ID for each payment transaction
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
-  paymentDate!: Date; // Date and time of the payment
+  paymentDate!: Date;
 
-  @Column({ type: "varchar", length: 50, nullable: false })
-  paymentMethod!: string; // Payment method (e.g., Credit, Debit, PayPal)
+  @Column({ enum: PaymentMethod })
+  paymentMethod?: PaymentMethod;
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
-  amount!: number; // Payment amount
+  amount!: number;
 
-  @Column({ type: "varchar", length: 20, default: "Pending" })
-  status!: string; // Payment status (e.g., Confirmed, Failed)
+  @Column({
+    enum: PaymentStatus,
+    default: PaymentStatus.pending,
+  })
+  status!: PaymentStatus;
 
   @CreateDateColumn()
   createdDate!: Date;
@@ -35,7 +40,6 @@ export class Payment {
   @UpdateDateColumn()
   modifiedDate!: Date;
 
-  // Relationships
   @JoinColumn({ name: "orderId" })
-  order!: Order; // Foreign Key referencing the Order table
+  order!: Order;
 }
