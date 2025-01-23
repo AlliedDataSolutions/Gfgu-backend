@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Order } from "../Order/order";
 
 
 @Entity()
@@ -26,4 +27,7 @@ export class User {
 
     @CreateDateColumn()
     modifeidDate!: Date
+
+    @OneToMany(() => Order, (order) => order.user)
+    orders!: Order[]
 }
