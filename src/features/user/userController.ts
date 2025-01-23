@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../config/db";
-import { User } from "../user/user";
+import { User } from "./userModel";
 import { Request, Response } from "express";
 
 const user = async (req: Request, res: Response) => {

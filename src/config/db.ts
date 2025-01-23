@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
 import { Credential } from "../features/auth/credentialModel";
-import { User } from "../features/user/user";
+import { User } from "../features/user/userModel";
 import { Payment } from "../features/payment";
 import { Order } from "../features/order";
 import { Product, ProductImage } from "../features/product";

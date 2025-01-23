@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
 } from "typeorm";
-import { User } from "../user/user";
+import { User } from "../user/userModel";
 import { OrderStatus } from "./orderStatus";
 // import { OrderLine } from "./OrderLine";
 
