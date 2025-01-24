@@ -5,7 +5,6 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     ManyToMany,
-    JoinTable
 } from "typeorm";
 import { Product } from "./productModel";
 
