@@ -2,8 +2,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -11,11 +13,16 @@ import {
 import { Image } from "../image";
 import { Category } from "./categoryModel";
 import { OrderLine } from "../order";
+import { Vendor } from "../user";
 
 @Entity()
 export class Product {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
+
+  @ManyToOne(() => Vendor, (vendor) => vendor.products)
+  @JoinColumn()
+  vendor!: Vendor
 
   @ManyToMany(() => Image, (image) => image.products)
   @JoinTable({ name: "productImages" }) // This decorator creates the join table
@@ -31,7 +38,7 @@ export class Product {
   @Column()
   name!: string;
 
-  @Column()
+  @Column({nullable: false})
   description?: string;
 
   @Column()

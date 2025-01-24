@@ -30,13 +30,13 @@ export class OrderLine {
   @Column()
   quantity!: number;
 
-  @Column()
+  @Column({ nullable: true })
   discountStartDate?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   discountEndDate?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   discountAmount?: Date;
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })

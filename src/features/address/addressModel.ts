@@ -25,16 +25,16 @@ export class Address {
   })
   addressType?: AddressType;
 
-  @Column()
+  @Column({ nullable: true })
   streetName?: string;
 
-  @Column()
+  @Column({ nullable: true })
   town?: string;
 
   @Column()
   province!: string;
 
-  @Column()
+  @Column({ nullable: true })
   postalCode?: string;
 
   @CreateDateColumn()

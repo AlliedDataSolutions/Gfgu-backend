@@ -11,8 +11,8 @@ import { Product } from "./productModel";
 
 @Entity()
 export class Category {
-    @PrimaryGeneratedColumn()
-    id!: number;
+    @PrimaryGeneratedColumn("uuid")
+    id!: string;
 
     @ManyToMany(() => Product, (product) => product.categories)
     products?: Product[];

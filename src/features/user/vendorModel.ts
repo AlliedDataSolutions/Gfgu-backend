@@ -9,6 +9,7 @@ import {
 import { ConfirmationStatus } from "./confirmationStatus";
 import { User } from "../user/userModel";
 import { OrderLine } from "../order";
+import { Product } from "../product";
 
 @Entity()
 export class Vendor {
@@ -18,6 +19,9 @@ export class Vendor {
   @OneToOne(() => User, (user) => user.vendor)
   @JoinColumn()
   user!: User;
+
+  @OneToMany(() => Product, (product) => product.vendor)
+  products?: Product[]
 
   @OneToMany(() => OrderLine, (orderLine) => orderLine.vendor)
   orderLines?: OrderLine[];
