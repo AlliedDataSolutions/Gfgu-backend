@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  OneToOne,
   ManyToOne,
   PrimaryGeneratedColumn,
   OneToMany,
@@ -9,16 +10,20 @@ import {
 import { User } from "../user/userModel";
 import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
+import { Payment } from "../payment/";
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @OneToMany(() => OrderLine, (orderLine) => orderLine.order, { 
-    cascade: true // Automatically persist/remove order lines when an order is persisted/removed
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.order, {
+    cascade: true, // Automatically persist/remove order lines when an order is persisted/removed
   })
   orderLines?: OrderLine[];
+
+  @OneToOne(() => Payment, (payment) => payment.order)
+  payment?: Payment;
 
   @Column()
   orderDate!: Date;

@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
+  OneToOne,
 } from "typeorm";
 import { Order } from "../order/orderModel";
 import { PaymentStatus } from "./paymentStatus";
@@ -40,6 +41,7 @@ export class Payment {
   @UpdateDateColumn()
   modifiedDate!: Date;
 
-  @JoinColumn({ name: "orderId" })
+  @OneToOne(() => Order, (order) => order.payment)
+  @JoinColumn()
   order!: Order;
 }

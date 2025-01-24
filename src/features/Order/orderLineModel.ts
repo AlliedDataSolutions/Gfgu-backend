@@ -4,6 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -29,8 +30,17 @@ export class OrderLine {
   @Column()
   quantity!: number;
 
+  @Column()
+  discountStartDate?: Date;
+
+  @Column()
+  discountEndDate?: Date;
+
+  @Column()
+  discountAmount?: Date;
+
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
-  price!: number;
+  unitPrice!: number;
 
   @CreateDateColumn()
   createdDate!: Date;
