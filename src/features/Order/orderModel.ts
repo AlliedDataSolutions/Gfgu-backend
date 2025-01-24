@@ -5,14 +5,20 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
 } from "typeorm";
+
 import { User } from "../user/userModel";
 import { OrderStatus } from "./orderStatus";
-// import { OrderLine } from "./OrderLine";
+import { OrderLine } from "./orderLineModel";
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
+
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.order, { 
+    cascade: true // Automatically persist/remove order lines when an order is persisted/removed
+  })
+  orderLines?: OrderLine[];
 
   @Column()
   orderDate!: Date;
@@ -38,7 +44,4 @@ export class Order {
     onDelete: "CASCADE",
   })
   user!: User; // Foreign Key referencing User
-
-  // @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
-  // orderLines!: OrderLine[];
 }

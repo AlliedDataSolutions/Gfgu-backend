@@ -4,7 +4,7 @@ import reflect from "reflect-metadata";
 import dotenv from "dotenv";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
-import userRoute from "./features/user/userRoute";
+import userRoute from "./features/user/userRouter";
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;

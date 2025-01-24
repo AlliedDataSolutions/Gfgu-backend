@@ -4,11 +4,13 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { Image } from "../image";
 import { Category } from "./categoryModel";
+import { OrderLine } from "../order";
 
 @Entity()
 export class Product {
@@ -20,8 +22,11 @@ export class Product {
   images?: Image[];
 
   @ManyToMany(() => Category, (category) => category.products)
-  @JoinTable({name: "productCategories"})
+  @JoinTable({ name: "productCategories" })
   categories?: Category[];
+
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.product)
+  orderLines?: OrderLine[];
 
   @Column()
   name!: string;
