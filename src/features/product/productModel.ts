@@ -1,32 +1,55 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
+import { Image } from "../image";
+import { Category } from "./categoryModel";
+import { OrderLine } from "../order";
+import { Vendor } from "../user";
 
 @Entity()
 export class Product {
-    @PrimaryGeneratedColumn("uuid")
-    id!: string
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-    @Column()
-    name!: string
+  @ManyToOne(() => Vendor, (vendor) => vendor.products)
+  @JoinColumn()
+  vendor!: Vendor
 
-    @Column()
-    lastName!: string
+  @ManyToMany(() => Image, (image) => image.products)
+  @JoinTable({ name: "productImages" }) // This decorator creates the join table
+  images?: Image[];
 
-    @Column()
-    description!: string
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable({ name: "productCategories" })
+  categories?: Category[];
 
-    @Column()
-    price!: number
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.product)
+  orderLines?: OrderLine[];
 
-    @Column({nullable: true})
-    phoneNumber!: string
+  @Column()
+  name!: string;
 
-    @Column()
-    stockLevel!: number
+  @Column({nullable: false})
+  description?: string;
 
-    @CreateDateColumn()
-    createdDate!: Date
+  @Column()
+  price!: number;
 
-    @CreateDateColumn()
-    modifeidDate!: Date
+  @Column()
+  stockLevel!: number;
+
+  @CreateDateColumn()
+  createdDate!: Date;
+
+  @CreateDateColumn()
+  modifeidDate!: Date;
 }

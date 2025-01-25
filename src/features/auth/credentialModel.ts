@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
-import { User } from "../user/user";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
+import { User } from "../user/userModel";
+import { Role } from "./role";
 
 @Entity()
 export class Credential {
@@ -8,10 +15,10 @@ export class Credential {
 
   @Column({
     type: "enum",
-    enum: ["customer", "vendor", "manager", "admin"],
-    default: "customer",
+    enum: Role,
+    default: Role.customer,
   })
-  role!: string;
+  role!: Role;
 
   @OneToOne(() => User, { onDelete: "CASCADE" })
   @JoinColumn()
