@@ -1,8 +1,8 @@
 import { DataSource } from "typeorm";
 import { Credential } from "../features/auth/credentialModel";
 import { User } from "../features/user/userModel";
-import { Payment } from "../features/payment";
-import { Order, OrderLine } from "../features/order";
+import { Payment } from "../features/Payment/paymentModel";
+import { Order, OrderLine } from "../features/Order/orderModel";
 import { Product, Category } from "../features/product";
 import { Image } from "../features/image";
 import { Vendor } from "../features/user";
