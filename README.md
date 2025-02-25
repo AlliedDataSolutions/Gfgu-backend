@@ -10,6 +10,8 @@ A multivendor app. This is the backend repo
 
 ### Run app
 
+#### Run local
+
 Make sure to have docker running on you computer, then run the code below
 
 ```javascript
@@ -26,6 +28,14 @@ docker compose up
 
 server should be running on: 
 http://localhost:13000/
+
+#### Run development
+
+```javascript
+
+npm run dev
+
+```
 
 ## Project structure
 Project is feature-base structured. Here is an example 
@@ -56,7 +66,7 @@ project-root/
 │   │   │   └── index.js
 │   ├── config/          # Configuration files(eg., DB connection, app settings)
 │   │   ├── db.js
-│   │   ├── appConfig.js
+│   │   ├── config.js
 │   │   └── index.js
 │   ├── middlewares/          # Global middlewares
 │   │   ├── errorMiddleware.js

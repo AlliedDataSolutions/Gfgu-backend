@@ -7,16 +7,24 @@ import { Product, Category } from "../features/product";
 import { Image } from "../features/image";
 import { Vendor } from "../features/user";
 import { Address } from "../features/address";
+import config from "./config";
+
+
+console.log(`Server is running on port ${config.username}`);
 
 const AppDataSource = new DataSource({
   type: "postgres",
-  host: "db",
-  port: 5432,
-  username: "user123",
-  password: "password123",
-  database: "db123",
-  synchronize: true, //set to false in production
-  logging: true,
+  //url: config.databaseUrl,
+  host: config.host,
+  port: config.port,
+  username: config.username,
+  password: config.password,
+  database: config.database,
+  ssl: {
+    rejectUnauthorized: false //true for production
+  },
+  synchronize: config.synchronize,
+  logging: config.logging,
   entities: [
     Credential,
     User,
