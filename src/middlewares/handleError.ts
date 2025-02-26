@@ -4,7 +4,7 @@ import { isCelebrateError } from "celebrate";
 const handleError = (err: any, req: Request, res: Response, next: NextFunction): Response | void => {
   console.error("Error caught in middleware:", err); // Debugging line
 
-  // ✅ Handle Celebrate validation errors properly
+  // Handle Celebrate validation errors properly
   if (isCelebrateError(err)) {
     // Get the first validation error message
     const errorMessages: string[] = [];
