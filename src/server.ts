@@ -1,7 +1,7 @@
-import "./config/config"; 
+import "./config/config";
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
-import "reflect-metadata"; 
+import "reflect-metadata";
 import { errors } from "celebrate";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
@@ -17,6 +17,9 @@ app.use(cors());
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.get("/api/test", (req: Request, res: Response) => {
+  res.status(201).json({ message: "testing works" });
+});
 
 // Handle celebrate validation errors
 //app.use(errors());
