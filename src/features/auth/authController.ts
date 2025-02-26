@@ -1,31 +1,21 @@
 import { AppDataSource } from "../../config/db";
-import { User } from "../user/userModel";
-import { Credential, Role } from "../auth";
+import { User } from "../user";
 import { Request, Response } from "express";
+import { AuthService } from "./AuthService";
+
+const authService = new AuthService();
 
 const register = async (req: Request, res: Response) => {
-  // Example: Creating a new user and credential
-  const userRepository = AppDataSource.getRepository(User);
-  const credentialRepository = AppDataSource.getRepository(Credential);
-
-  const newUser = userRepository.create({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phoneNumber: "1234567890",
-  });
-
-  const savedUser = await userRepository.save(newUser);
-
-  const newCredential = credentialRepository.create({
-    email: "john.doe@example.com",
-    password: "securepassword",
-    role: Role.customer,
-    user: savedUser,
-  });
-
-  await credentialRepository.save(newCredential);
-  res.status(200).json({ message: "register user" });
+  try {
+    const result = await authService.register(req.body);
+    res.status(201).json(result);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred" });
+    }
+  }
 };
 
 const login = async (req: Request, res: Response) => {

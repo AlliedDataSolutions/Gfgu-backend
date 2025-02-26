@@ -20,9 +20,6 @@ const AppDataSource = new DataSource({
   username: config.username,
   password: config.password,
   database: config.database,
-  ssl: {
-    rejectUnauthorized: false //true for production
-  },
   synchronize: config.synchronize,
   logging: config.logging,
   entities: [
