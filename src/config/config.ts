@@ -6,10 +6,6 @@ const envFile = `.env.${process.env.NODE_ENV || "local"}`;
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
 console.log(`Using ${envFile} configuration`);
-console.log(`host: ${process.env.DB_HOST} `);
-console.log(`username: ${process.env.DB_USER} `);
-console.log(`database: ${process.env.POSTGRES_DATABASE} `);
-console.log(`port: ${process.env.POSTGRES_PORT} `);
 
 export default {
   databaseUrl: process.env.DB_URL,

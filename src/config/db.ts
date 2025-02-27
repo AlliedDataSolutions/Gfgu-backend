@@ -10,7 +10,7 @@ import { Address } from "../features/address";
 import config from "./config";
 
 
-console.log(`Server is running on port ${config.username}`);
+console.log(`DB Server is running on port ${config.port}`);
 
 const AppDataSource = new DataSource({
   type: "postgres",
