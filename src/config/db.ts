@@ -11,6 +11,10 @@ import config from "./config";
 
 
 console.log(`DB Server is running on port ${config.port}`);
+console.log(`host:: ${config.host}`);
+console.log(`username:: ${config.username}`);
+console.log(`password:: ${config.password}`);
+console.log(`database:: ${config.database}`);
 
 const AppDataSource = new DataSource({
   type: "postgres",
