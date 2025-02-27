@@ -15,4 +15,4 @@ services:
     volumes:
       - .:/app # Mount current directory to /app in the container
       - /app/node_modules # Ignore node_modules (prevents overwriting container-installed modules)
-    command: ["npm", "run", "dev"] # Ensure your dev script watches for file changes
+    command: ["npm", "run", "local"] # Ensure your local script watches for file changes
