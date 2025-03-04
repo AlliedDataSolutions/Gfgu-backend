@@ -6,6 +6,8 @@ import { errors } from "celebrate";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
+import categoryRoute from "./features/product/categoryRouter";
+import productRoute from "./features/product/productRouter";
 import handleError from "./middlewares/handleError";
 
 const app: Application = express();
@@ -17,6 +19,8 @@ app.use(cors());
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/category", categoryRoute);
+app.use("/api/product", productRoute );
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
