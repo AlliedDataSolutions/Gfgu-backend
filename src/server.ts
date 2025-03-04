@@ -2,11 +2,10 @@ import "./config/config";
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import "reflect-metadata";
-import { errors } from "celebrate";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
-import handleError from "./middlewares/handleError";
+import { notFoundMiddleware, handleError } from "./middlewares/handleError";
 
 const app: Application = express();
 
@@ -21,10 +20,11 @@ app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
 
-// Handle celebrate validation errors
-//app.use(errors());
-
 // Custom error handler
+app.use((req: Request, res: Response, next: NextFunction) => {
+  notFoundMiddleware(req, res, next);
+});
+
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   handleError(err, req, res, next);
 });

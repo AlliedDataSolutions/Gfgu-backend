@@ -21,7 +21,7 @@ export class Vendor {
   user!: User;
 
   @OneToMany(() => Product, (product) => product.vendor)
-  products?: Product[]
+  products?: Product[];
 
   @OneToMany(() => OrderLine, (orderLine) => orderLine.vendor)
   orderLines?: OrderLine[];
@@ -29,7 +29,7 @@ export class Vendor {
   @Column()
   businessName!: string;
 
-  @Column()
+  @Column({ nullable: true })
   businessDescription?: string;
 
   @Column({
