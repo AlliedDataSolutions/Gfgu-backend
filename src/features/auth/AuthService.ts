@@ -23,46 +23,49 @@ const generateConfirmationToken = (user: User): string => {
 };
 
 export class AuthService {
-  private userRepo = AppDataSource.getRepository(User);
-  private credentialRepo = AppDataSource.getRepository(Credential);
-  private vendorRepo = AppDataSource.getRepository(Vendor);
-
   async register(data: any) {
     const { firstName, lastName, email, password, role, businessName } = data;
 
+    const userRepo = AppDataSource.getRepository(User);
+    const credentialRepo = AppDataSource.getRepository(Credential);
+    const vendorRepo = AppDataSource.getRepository(Vendor);
+
     // Check if email already exists
-    const existingCredential = await this.credentialRepo.findOne({
+    const existingCredential = await credentialRepo.findOne({
       where: { email },
     });
     if (existingCredential) throw new Error("Email already in use");
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = this.userRepo.create({ firstName, lastName, email });
-    await this.userRepo.save(user);
+    const user = userRepo.create({ firstName, lastName, email });
+    await userRepo.save(user);
 
     // Create credential entity
-    const credential = this.credentialRepo.create({
+    const credential = credentialRepo.create({
       email,
       password: hashedPassword,
       role,
       user,
     });
-    await this.credentialRepo.save(credential);
-    await this.sendConfirmationEmail(user)
+    await credentialRepo.save(credential);
+    await this.sendConfirmationEmail(user);
 
     // If vendor, create vendor entity
     if (role === Role.vendor) {
-      const vendor = this.vendorRepo.create({ businessName, user });
-      await this.vendorRepo.save(vendor);
+      const vendor = vendorRepo.create({ businessName, user });
+      await vendorRepo.save(vendor);
     }
 
     return { message: "User registered successfully" };
   }
 
   async login(email: string, password: string) {
-    const credential = await this.credentialRepo.findOne({ where: { email } });
-    const user = await this.userRepo.findOne({ where: { email: email } });
+    const userRepo = AppDataSource.getRepository(User);
+    const credentialRepo = AppDataSource.getRepository(Credential);
+
+    const credential = await credentialRepo.findOne({ where: { email } });
+    const user = await userRepo.findOne({ where: { email: email } });
     if (!credential || !user) throw new Error("User not found");
 
     const isMatch = await bcrypt.compare(password, credential.password);
@@ -86,9 +89,10 @@ export class AuthService {
     return { message: "Login successful", accessToken, refreshToken };
   }
 
-  
   async confirmEmail(token: string) {
     try {
+      const userRepo = AppDataSource.getRepository(User);
+
       const decoded = jwt.verify(
         token,
         process.env.JWT_SECRET as string
@@ -99,14 +103,14 @@ export class AuthService {
         throw new Error("Invalid token format");
       }
 
-      const user = await this.userRepo.findOne({
+      const user = await userRepo.findOne({
         where: { email: decoded.email },
       });
 
       if (!user) throw new Error("User not found");
 
       user.isConfirmed = true;
-      await this.userRepo.save(user);
+      await userRepo.save(user);
 
       return { message: "Email confirmed successfully" };
     } catch (error) {
@@ -140,7 +144,7 @@ export class AuthService {
     const token = generateConfirmationToken(user);
     const confirmUrl = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
 
-    console.log("registration token", token)
+    console.log("registration token", token);
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
