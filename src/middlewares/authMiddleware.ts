@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.token;
   if (!token) {
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
@@ -16,19 +16,19 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     req.user = { id: decoded.userId, role: decoded.role }; // Attach user to request
     next();
   } catch (error) {
-    res.status(403).json({ error: "Invalid token" });
+    res.status(403).json({ message: "Invalid token" });
     return;
   }
 };
 
 const roleMiddleware = (roles: string[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+    if (!req.user) return res.status(401).json({ message: "Unauthorized" });
 
     if (!roles.includes(req.user.role)) {
       return res
         .status(403)
-        .json({ error: "Forbidden: Insufficient permissions" });
+        .json({ message: "Forbidden: Insufficient permissions" });
     }
 
     next();

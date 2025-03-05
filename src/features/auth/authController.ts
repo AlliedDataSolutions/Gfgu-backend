@@ -20,7 +20,7 @@ const confirmEmail = async (
   try {
     const { token } = req.query;
     if (!token || typeof token !== "string") {
-      res.status(400).json({ error: "Token is required" });
+      res.status(400).json({ message: "Token is required" });
       return;
     }
 
