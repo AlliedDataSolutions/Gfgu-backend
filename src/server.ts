@@ -1,6 +1,7 @@
 import "./config/config";
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import "reflect-metadata";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
@@ -12,6 +13,8 @@ const app: Application = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+// app.use(cors({ credentials: true, origin: "http://localhost:5000" })); // ✅ Ensure CORS allows cookies
+app.use(cookieParser());
 
 // Routes
 app.use("/api/auth", authRoute);
