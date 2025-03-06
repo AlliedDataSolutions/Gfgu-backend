@@ -40,12 +40,12 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     res.cookie("token", response.accessToken, {
       httpOnly: true, // Prevent JavaScript access
       secure: secure,
-      sameSite: "strict", // Prevent CSRF attacks
+      sameSite: "none", // Prevent CSRF attacks
     });
     res.cookie("refreshToken", response.refreshToken, {
       httpOnly: true,
       secure: secure,
-      sameSite: "strict",
+      sameSite: "none",
     });
     res.status(200).json({
       message: response.message,
