@@ -37,15 +37,16 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const response = await authService.login(email, password);
 
     const secure = process.env.NODE_ENV === "production"; // Only send over HTTPS in production
+    const sameSite = process.env.NODE_ENV === "production" ? "none" : "lax"
     res.cookie("token", response.accessToken, {
       httpOnly: true, // Prevent JavaScript access
       secure: secure,
-      sameSite: "none", // Prevent CSRF attacks
+      sameSite: sameSite, // Prevent CSRF attacks
     });
     res.cookie("refreshToken", response.refreshToken, {
       httpOnly: true,
       secure: secure,
-      sameSite: "none",
+      sameSite: sameSite,
     });
     res.status(200).json({
       message: response.message,
