@@ -12,12 +12,18 @@ const app: Application = express();
 
 // Middleware
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:5173", 
+  process.env.FRONTEND_URL, 
+].filter(Boolean) as string[]; 
+
 app.use(
   cors({
-    credentials: true,
-    origin: process.env.FRONTEND_URL, // Ensure CORS allows cookies
+    origin: allowedOrigins, 
+    credentials: true, 
   })
-); 
+);
 app.use(cookieParser());
 
 // Routes
