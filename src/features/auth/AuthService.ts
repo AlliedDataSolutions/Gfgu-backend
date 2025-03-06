@@ -49,13 +49,14 @@ export class AuthService {
       user,
     });
     await credentialRepo.save(credential);
-    await this.sendConfirmationEmail(user);
 
     // If vendor, create vendor entity
     if (role === Role.vendor) {
       const vendor = vendorRepo.create({ businessName, user });
       await vendorRepo.save(vendor);
     }
+
+    await this.sendConfirmationEmail(user);
 
     return { message: "User registered successfully" };
   }
@@ -141,19 +142,23 @@ export class AuthService {
 
   // Send confirmation email
   async sendConfirmationEmail(user: User) {
-    const token = generateConfirmationToken(user);
-    const confirmUrl = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
+    try {
+      const token = generateConfirmationToken(user);
+      const confirmUrl = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
 
-    console.log("registration token", token);
+      console.log("registration token", token);
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: user.email,
-      subject: "Confirm Your Email",
-      html: `<p>Please click the link below to confirm your email:</p>
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: "Confirm Your Email",
+        html: `<p>Please click the link below to confirm your email:</p>
            <a href="${confirmUrl}">Confirm Email</a>`,
-    };
+      };
 
-    await transporter.sendMail(mailOptions);
+      await transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.log("sendConfirmationEmail fails");
+    }
   }
 }

@@ -12,8 +12,12 @@ const app: Application = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
-// app.use(cors({ credentials: true, origin: "http://localhost:5000" })); // ✅ Ensure CORS allows cookies
+app.use(
+  cors({
+    credentials: true,
+    origin: process.env.FRONTEND_URL, // Ensure CORS allows cookies
+  })
+); 
 app.use(cookieParser());
 
 // Routes
