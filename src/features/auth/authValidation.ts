@@ -17,3 +17,10 @@ export const registerValidation = celebrate({
     }),
   }),
 });
+
+export const loginValidation = celebrate({
+  body: Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  }),
+});
