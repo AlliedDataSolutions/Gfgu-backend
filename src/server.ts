@@ -6,7 +6,9 @@ import "reflect-metadata";
 import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
+import productRoute from "./features/product/productRouter";
 import { notFoundMiddleware, handleError } from "./middlewares/handleError";
+import { authMiddleware } from "./middlewares/authMiddleware";
 
 const app: Application = express();
 
@@ -14,21 +16,22 @@ const app: Application = express();
 app.use(express.json());
 
 const allowedOrigins = [
-  "http://localhost:5173", 
-  process.env.FRONTEND_URL, 
-].filter(Boolean) as string[]; 
+  "http://localhost:5173",
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
 
 app.use(
   cors({
-    origin: allowedOrigins, 
-    credentials: true, 
+    origin: allowedOrigins,
+    credentials: true,
   })
 );
 app.use(cookieParser());
 
 // Routes
 app.use("/api/auth", authRoute);
-app.use("/api/user", userRoute);
+app.use("/api/user", authMiddleware, userRoute);
+app.use("/api/product", authMiddleware, productRoute);
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
