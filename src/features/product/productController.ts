@@ -85,7 +85,7 @@ const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { name, description, price, stockLevel, imageIds } = req.body;
+    const { name, description, price, stockLevel, imageIds, categoryIds } = req.body;
 
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });
@@ -102,6 +102,7 @@ const createProduct = async (
       price: parsedPrice,
       stockLevel: parsedStockLevel,
       imageIds,
+      categoryIds,
     });
 
     res.status(201).json(data);

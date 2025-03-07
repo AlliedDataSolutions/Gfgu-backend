@@ -6,6 +6,7 @@ export const createProductValidation = celebrate({
     description: Joi.string().required(),
     price: Joi.number().required(),
     stockLevel: Joi.number().required(),
-    //imageIds: Joi.array().required(), // Todo: Images to be taken care of
+    //imageIds: Joi.array().required(), // Todo: Images to be taken care of,
+    categoryIds: Joi.array()
   }),
 });
