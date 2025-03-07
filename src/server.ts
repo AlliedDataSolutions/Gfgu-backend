@@ -7,6 +7,7 @@ import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
 import { notFoundMiddleware, handleError } from "./middlewares/handleError";
+import addressRouter from "./features/address/addressRouter";
 
 const app: Application = express();
 
@@ -29,6 +30,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/address", addressRouter);
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
