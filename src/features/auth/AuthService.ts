@@ -8,11 +8,12 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Configure nodemailer (Use a real SMTP service like SendGrid, Mailgun)
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  service: "sandbox.smtp.mailtrap.io",
+  port: 2525,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    pass: process.env.EMAIL_PASS
+  }
 });
 
 // Generate a confirmation token
@@ -72,8 +73,10 @@ export class AuthService {
     const isMatch = await bcrypt.compare(password, credential.password);
     if (!isMatch) throw new Error("Email or password not correct");
 
-    if (!user.isConfirmed)
+    if (!user.isConfirmed) {
+      await this.sendConfirmationEmail(user);
       throw new Error("Please confirm your email before logging in");
+    }
 
     const accessToken = jwt.sign(
       { userId: user.id, role: credential.role },
@@ -146,19 +149,18 @@ export class AuthService {
       const token = generateConfirmationToken(user);
       const confirmUrl = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
 
-      console.log("registration token", token);
-
       const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: "gfgu@demomailtrap.co",
         to: user.email,
         subject: "Confirm Your Email",
         html: `<p>Please click the link below to confirm your email:</p>
            <a href="${confirmUrl}">Confirm Email</a>`,
       };
 
-      await transporter.sendMail(mailOptions);
+      const info = await transporter.sendMail(mailOptions);
+      console.log("message sent", info.messageId);
     } catch (error) {
-      console.log("sendConfirmationEmail fails");
+      console.log("sendConfirmationEmail fails", error);
     }
   }
 }
