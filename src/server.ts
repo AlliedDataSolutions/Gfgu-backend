@@ -8,6 +8,7 @@ import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
 import productRoute from "./features/product/productRouter";
 import { notFoundMiddleware, handleError } from "./middlewares/handleError";
+import addressRouter from "./features/address/addressRouter";
 import { authMiddleware } from "./middlewares/authMiddleware";
 
 const app: Application = express();
@@ -31,6 +32,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", authMiddleware, userRoute);
+app.use("/api/address", addressRouter);
 app.use("/api/product", authMiddleware, productRoute);
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
