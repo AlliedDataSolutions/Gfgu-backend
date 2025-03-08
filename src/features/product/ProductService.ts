@@ -127,8 +127,8 @@ export class ProductService {
         price,
         stockLevel,
         vendor,
-        images: imageIds.map((id) => ({ id })),
-        categories: categoryIds.map((id) => ({ id })),
+        images: (imageIds ?? []).map((id) => ({ id })),
+        categories: (categoryIds ?? []).map((id) => ({ id })),
       });
 
       const result = await productRepo.save(newProduct);
