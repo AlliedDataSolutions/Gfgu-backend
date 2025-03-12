@@ -9,7 +9,7 @@ const getAllCategory = async (req: Request, res: Response) => {
   try {
     const categoryRepo = AppDataSource.getRepository(Category);
     const result = await categoryRepo.find();
-    res.status(200).json({ result });
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -85,7 +85,7 @@ const createProduct = async (
   next: NextFunction
 ) => {
   try {
-    const { name, description, price, stockLevel, imageIds, categoryIds } = req.body;
+    const { name, description, price, stockLevel, imageUrls, categoryIds } = req.body;
 
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });
@@ -101,7 +101,7 @@ const createProduct = async (
       description,
       price: parsedPrice,
       stockLevel: parsedStockLevel,
-      imageIds,
+      imageUrls,
       categoryIds,
     });
 

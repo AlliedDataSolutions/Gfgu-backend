@@ -1,30 +1,33 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    ManyToMany,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToMany,
 } from "typeorm";
 import { Product } from "./productModel";
 
 @Entity()
 export class Category {
-    @PrimaryGeneratedColumn("uuid")
-    id!: string;
+  @PrimaryGeneratedColumn("uuid")
+  id!: string;
 
-    @ManyToMany(() => Product, (product) => product.categories)
-    products?: Product[];
+  @ManyToMany(() => Product, (product) => product.categories)
+  products?: Product[];
 
-    @Column({ unique: true })
-    type!: string; 
+  @Column({ nullable: true })
+  imageUrl?: string;
 
-    @Column({ type: "text" })
-    description?: string; 
+  @Column({ unique: true })
+  type!: string;
 
-    @CreateDateColumn()
-    createdAt!: Date; 
+  @Column({ type: "text" })
+  description?: string;
 
-    @UpdateDateColumn()
-    updatedAt!: Date; 
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }
