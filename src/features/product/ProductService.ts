@@ -39,14 +39,14 @@ export class ProductService {
       // Search by name or description
       if (filters.search) {
         query.andWhere(
-          "(product.name ILIKE :search OR product.description ILIKE :search)",
+          "(product.name ILIKE :search OR product.description ILIKE :search OR categories.description ILIKE :search)",
           { search: `%${filters.search}%` }
         );
       }
 
       // Filter by category
       if (filters.category) {
-        query.andWhere("categories.type = :category", {
+        query.andWhere("categories.type ILIKE :category", {
           category: filters.category,
         });
       }
