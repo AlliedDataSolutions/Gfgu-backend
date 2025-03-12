@@ -11,8 +11,8 @@ import { roleMiddleware } from "../../middlewares/authMiddleware";
 const router = express.Router();
 
 router.get("/", getProducts);
-router.get("/:id", getProductByID);
 router.get("/categories", getAllCategory);
+router.get("/:id", getProductByID);
 
 //vendor endpoint
 router.post(
