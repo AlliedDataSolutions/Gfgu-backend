@@ -7,6 +7,7 @@ import { initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
 import productRoute from "./features/product/productRouter";
+import orderRoute from "./features/order/orderRouter"; 
 import { notFoundMiddleware, handleError } from "./middlewares/handleError";
 import addressRouter from "./features/address/addressRouter";
 import { authMiddleware } from "./middlewares/authMiddleware";
@@ -34,6 +35,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/user", authMiddleware, userRoute);
 app.use("/api/address", addressRouter);
 app.use("/api/product", authMiddleware, productRoute);
+app.use("/api/order", authMiddleware, orderRoute);
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
