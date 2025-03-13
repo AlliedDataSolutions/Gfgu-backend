@@ -74,7 +74,8 @@ export class ProductService {
       query.skip(skip).take(take);
 
       // Execute the query
-      return query.getMany();
+      const [records, count] = await query.getManyAndCount();
+      return { records, count };
     } catch (error) {
       throw new Error("Error fetching products");
     }
