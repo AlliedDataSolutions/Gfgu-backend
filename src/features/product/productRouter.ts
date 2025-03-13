@@ -4,6 +4,7 @@ import {
   getProducts,
   getProductByID,
   createProduct,
+  getAllVendor,
 } from "./productController";
 import { createProductValidation } from "./productValidation";
 import { roleMiddleware } from "../../middlewares/authMiddleware";
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.get("/", getProducts);
 router.get("/categories", getAllCategory);
+router.get("/vendors", getAllVendor);
 router.get("/:id", getProductByID);
 
 //vendor endpoint
