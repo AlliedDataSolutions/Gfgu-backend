@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ProductService } from "./ProductService";
 import { Category } from "./categoryModel";
+import { Vendor } from "../user/vendorModel";
 import { AppDataSource } from "../../config/db";
 
 const productService = new ProductService();
@@ -9,6 +10,16 @@ const getAllCategory = async (req: Request, res: Response) => {
   try {
     const categoryRepo = AppDataSource.getRepository(Category);
     const result = await categoryRepo.find();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getAllVendor = async (req: Request, res: Response) => {
+  try {
+    const vendorRepo = AppDataSource.getRepository(Vendor);
+    const result = await vendorRepo.find();
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
@@ -111,4 +122,4 @@ const createProduct = async (
   }
 };
 
-export { getAllCategory, getProducts, getProductByID, createProduct };
+export { getAllCategory, getProducts, getProductByID, createProduct, getAllVendor };
