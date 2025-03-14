@@ -4,13 +4,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { Order } from "./orderModel";
-import { Product } from "../product";
-import { Vendor } from "../user";
+import { Product } from "../product/productModel"; 
+import { Vendor } from "../user/vendorModel"; 
 
 @Entity("orderLine")
 export class OrderLine {
@@ -36,8 +35,8 @@ export class OrderLine {
   @Column({ nullable: true })
   discountEndDate?: Date;
 
-  @Column({ nullable: true })
-  discountAmount?: Date;
+  @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
+  discountAmount?: number; 
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
   unitPrice!: number;
