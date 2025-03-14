@@ -18,7 +18,7 @@ export class Order {
   id!: string;
 
   @OneToMany(() => OrderLine, (orderLine) => orderLine.order, {
-    cascade: true, // Automatically persist/remove order lines when an order is persisted/removed
+    cascade: true, 
   })
   orderLines?: OrderLine[];
 
@@ -48,5 +48,5 @@ export class Order {
     nullable: false,
     onDelete: "CASCADE",
   })
-  user!: User; // Foreign Key referencing User
+  user!: User; 
 }
