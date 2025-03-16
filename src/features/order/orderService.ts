@@ -20,10 +20,13 @@ export class OrderService {
       }
 
       // Ensure product exists
-      const product = await productRepo.findOne({ where: { id: productId } });
+      const product = await productRepo.findOne({ where: { id: productId }, relations: ["vendor"] });
       if (!product) {
         throw new Error("Product not found");
       }
+
+      // Retrieve vendor from product
+      const vendor = product.vendor;
 
       // Find or create order
       let order = await orderRepo.findOne({
@@ -31,8 +34,7 @@ export class OrderService {
         relations: ["orderLines", "orderLines.product"],
       });
       if (!order) {
-        order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] }); //Add price here - try to get price from product
-        //if not orderlinemodel has unitprice seperate try that. 
+        order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] });
       }
 
       // Ensure orderLines is initialized
@@ -47,7 +49,8 @@ export class OrderService {
       if (orderLine) {
         orderLine.quantity += quantity;
       } else {
-        orderLine = orderLineRepo.create({ product, quantity,unitPrice:product.price });
+        orderLine = orderLineRepo.create({ product, quantity, unitPrice: product.price, vendor });
+        orderLine.order = order; // Ensure the order is set on the order line
         order.orderLines.push(orderLine);
       }
 
