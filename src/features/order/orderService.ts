@@ -85,11 +85,13 @@ export class OrderService {
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
+      console.log(`Finding order for user: ${userId} with status pending`);
       const order = await orderRepo.findOne({
         where: { user: { id: userId }, status: OrderStatus.pending },
         relations: ["orderLines"],
       });
       if (!order) {
+        console.error("Order not found");
         throw new Error("Order not found");
       }
 
@@ -98,21 +100,30 @@ export class OrderService {
         order.orderLines = [];
       }
 
+      console.log(`Order lines: ${JSON.stringify(order.orderLines)}`);
+      console.log(`Finding order line with ID: ${orderLineId}`);
       const orderLine = order.orderLines.find(
         (line) => line.id === orderLineId
       );
       if (!orderLine) {
+        console.error("Order line not found");
         throw new Error("Order line not found");
       }
 
+      // Remove the order line
+      console.log(`Removing order line with ID: ${orderLineId}`);
+      await orderLineRepo.remove(orderLine);
+
+      // Update the order's orderLines array and save the order
       order.orderLines = order.orderLines.filter(
         (line) => line.id !== orderLineId
       );
-      await orderLineRepo.remove(orderLine);
+      console.log(`Saving updated order for user: ${userId}`);
       await orderRepo.save(order);
 
       return order;
     } catch (error) {
+      console.error("Error removing order line:", error);
       throw new Error("Error removing order line");
     }
   }
@@ -173,20 +184,6 @@ export class OrderService {
       return orderLine;
     } catch (error) {
       throw new Error("Error updating order line quantity");
-    }
-  }
-
-  //Method to get orders for a specified user
-  async getUserOrders(userId: string) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const orders = await orderRepo.find({
-        where: { user: { id: userId } },
-        relations: ["orderLines", "orderLines.product"],
-      });
-      return orders;
-    } catch (error) {
-      throw new Error("Error fetching user orders");
     }
   }
 

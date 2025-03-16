@@ -4,7 +4,7 @@ import {
   getOrder,
   removeOrderLine,
   checkoutOrder,
-  getUserOrders,
+  updateOrderLineQuantity,
   getAllOrders,
   getVendorProductsOnOrders,
 } from "./orderController";
@@ -15,7 +15,8 @@ router.post("/add", addOrderLine);
 router.get("/:userId", getOrder);
 router.post("/remove", removeOrderLine);
 router.post("/checkout", checkoutOrder);
-router.get("/user-orders", getUserOrders);
-router.get('/admin/all-orders', getAllOrders);
-router.get('/vendor/products-on-orders/:vendorId', getVendorProductsOnOrders);
+router.post("/update-quantity", updateOrderLineQuantity);
+router.get("/admin/all-orders", getAllOrders);
+router.get("/vendor/products-on-orders/:vendorId", getVendorProductsOnOrders);
+
 export default router;
