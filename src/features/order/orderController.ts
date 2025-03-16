@@ -17,8 +17,8 @@ const addOrderLine = async (
     }
 
     const userId = req.user?.id;
-    const order = await orderService.addOrderLine(userId, productId, quantity);
-    res.status(200).json(order);
+    await orderService.addOrderLine(userId, productId, quantity);
+    res.status(201).json({ message: "Order has been added" });
   } catch (error) {
     next(error);
   }

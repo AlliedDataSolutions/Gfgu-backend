@@ -31,7 +31,8 @@ export class OrderService {
         relations: ["orderLines", "orderLines.product"],
       });
       if (!order) {
-        order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] });
+        order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] }); //Add price here - try to get price from product
+        //if not orderlinemodel has unitprice seperate try that. 
       }
 
       // Ensure orderLines is initialized
@@ -46,7 +47,7 @@ export class OrderService {
       if (orderLine) {
         orderLine.quantity += quantity;
       } else {
-        orderLine = orderLineRepo.create({ product, quantity });
+        orderLine = orderLineRepo.create({ product, quantity,unitPrice:product.price });
         order.orderLines.push(orderLine);
       }
 
