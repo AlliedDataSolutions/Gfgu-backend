@@ -8,7 +8,7 @@ export const registerValidation = celebrate({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
     role: Joi.string()
-      .valid(Role.customer, Role.vendor, Role.manager)
+      .valid(Role.customer, Role.vendor)
       .required(),
     businessName: Joi.when("role", {
       is: Role.vendor,

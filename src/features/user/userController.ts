@@ -1,11 +1,9 @@
-import { AppDataSource } from "../../config/db";
-import { User } from "./userModel";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "./UserService";
 
 const userService = new UserService();
 
-const userProfile = async (req: Request, res: Response) => {
+const userProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });
@@ -18,8 +16,7 @@ const userProfile = async (req: Request, res: Response) => {
     }
     res.status(200).json(userProfile);
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    next();
   }
 };
-
 export { userProfile };
