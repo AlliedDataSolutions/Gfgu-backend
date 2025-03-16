@@ -102,8 +102,23 @@ const updateOrderLineQuantity = async (
   } catch (error) {
     next(error);
   }
+};
 
-  
+const getUserOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const userId = req.user.id;
+    const orders = await orderService.getUserOrders(userId);
+    res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user || req.user.role !== "admin") {
@@ -132,7 +147,6 @@ const getVendorProductsOnOrders = async (req: Request, res: Response, next: Next
     next(error);
   }
 };
-};
 
 export {
   addOrderLine,
@@ -140,4 +154,7 @@ export {
   removeOrderLine,
   checkoutOrder,
   updateOrderLineQuantity,
+  getUserOrders,
+  getAllOrders,
+  getVendorProductsOnOrders,
 };
