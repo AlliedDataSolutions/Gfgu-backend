@@ -3,7 +3,11 @@ import { OrderService } from "./orderService";
 
 const orderService = new OrderService();
 
-const addOrderLine = async (req: Request, res: Response, next: NextFunction) => {
+const addOrderLine = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { productId, quantity } = req.body;
 
@@ -12,7 +16,7 @@ const addOrderLine = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const order = await orderService.addOrderLine(userId, productId, quantity);
     res.status(200).json(order);
   } catch (error) {
@@ -35,7 +39,11 @@ const getOrder = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const removeOrderLine = async (req: Request, res: Response, next: NextFunction) => {
+const removeOrderLine = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orderLineId } = req.params;
 
@@ -52,7 +60,11 @@ const removeOrderLine = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-const checkoutOrder = async (req: Request, res: Response, next: NextFunction) => {
+const checkoutOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });
@@ -67,7 +79,11 @@ const checkoutOrder = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFunction) => {
+const updateOrderLineQuantity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orderLineId, quantity } = req.body;
 
@@ -77,11 +93,21 @@ const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFu
     }
 
     const userId = req.user.id;
-    const orderLine = await orderService.updateOrderLineQuantity(userId, orderLineId, quantity);
+    const orderLine = await orderService.updateOrderLineQuantity(
+      userId,
+      orderLineId,
+      quantity
+    );
     res.status(200).json(orderLine);
   } catch (error) {
     next(error);
   }
 };
 
-export { addOrderLine, getOrder, removeOrderLine, checkoutOrder, updateOrderLineQuantity };
+export {
+  addOrderLine,
+  getOrder,
+  removeOrderLine,
+  checkoutOrder,
+  updateOrderLineQuantity,
+};

@@ -5,13 +5,12 @@ import {
   removeOrderLine,
   checkoutOrder,
 } from "./orderController";
-import { authMiddleware } from "../../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.post("/add", authMiddleware, addOrderLine);
-router.get("/:userId", authMiddleware, getOrder);
-router.post("/remove", authMiddleware, removeOrderLine);
-router.post("/checkout", authMiddleware, checkoutOrder);
+router.post("/add", addOrderLine);
+router.get("/:userId", getOrder);
+router.post("/remove", removeOrderLine);
+router.post("/checkout", checkoutOrder);
 
 export default router;
