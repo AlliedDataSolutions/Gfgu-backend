@@ -171,4 +171,45 @@ export class OrderService {
       throw new Error("Error updating order line quantity");
     }
   }
+
+  //Method to get orders for a specified user
+  async getUserOrders(userId: string) {
+    try {
+      const orderRepo = AppDataSource.getRepository(Order);
+      const orders = await orderRepo.find({
+        where: { user: { id: userId } },
+        relations: ["orderLines", "orderLines.product"],
+      });
+      return orders;
+    } catch (error) {
+      throw new Error("Error fetching user orders");
+    }
+  }
+
+  //Admin method to get all orders
+  async getAllOrders() {
+    try {
+      const orderRepo = AppDataSource.getRepository(Order);
+      const orders = await orderRepo.find({
+        relations: ["user", "orderLines", "orderLines.product"],
+      });
+      return orders;
+    } catch (error) {
+      throw new Error("Error fetching all orders");
+    }
+  }
+
+  //Vendor method to get products on orders
+  async getVendorProductsOnOrders(vendorId: string) {
+    try {
+      const productRepo = AppDataSource.getRepository(Product);
+      const products = await productRepo.find({
+        where: { vendor: { id: vendorId } },
+        relations: ["orderLines", "orderLines.order"],
+      });
+      return products;
+    } catch (error) {
+      throw new Error("Error fetching orders");
+    }
+  }
 }
