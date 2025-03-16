@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   OneToMany,
+  CreateDateColumn,
 } from "typeorm";
 
 import { User } from "../user/userModel";
@@ -25,8 +26,8 @@ export class Order {
   @OneToOne(() => Payment, (payment) => payment.order)
   payment?: Payment;
 
-  @Column()
-  orderDate!: Date;
+  @CreateDateColumn()
+  orderDate!: Date; 
 
   @Column({ nullable: true })
   requiredDate!: Date;
@@ -34,8 +35,8 @@ export class Order {
   @Column({ nullable: true })
   shippedDate?: Date;
 
-  @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
-  totalAmount!: number;
+  //@Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
+  //totalAmount!: number;
 
   @Column({
     type: "enum",

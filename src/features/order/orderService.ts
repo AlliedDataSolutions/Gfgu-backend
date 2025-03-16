@@ -20,10 +20,13 @@ export class OrderService {
       }
 
       // Ensure product exists
-      const product = await productRepo.findOne({ where: { id: productId } });
+      const product = await productRepo.findOne({ where: { id: productId }, relations: ["vendor"] });
       if (!product) {
         throw new Error("Product not found");
       }
+
+      // Retrieve vendor from product
+      const vendor = product.vendor;
 
       // Find or create order
       let order = await orderRepo.findOne({
@@ -46,7 +49,8 @@ export class OrderService {
       if (orderLine) {
         orderLine.quantity += quantity;
       } else {
-        orderLine = orderLineRepo.create({ product, quantity });
+        orderLine = orderLineRepo.create({ product, quantity, unitPrice: product.price, vendor });
+        orderLine.order = order; // Ensure the order is set on the order line
         order.orderLines.push(orderLine);
       }
 
@@ -169,6 +173,47 @@ export class OrderService {
       return orderLine;
     } catch (error) {
       throw new Error("Error updating order line quantity");
+    }
+  }
+
+  //Method to get orders for a specified user
+  async getUserOrders(userId: string) {
+    try {
+      const orderRepo = AppDataSource.getRepository(Order);
+      const orders = await orderRepo.find({
+        where: { user: { id: userId } },
+        relations: ["orderLines", "orderLines.product"],
+      });
+      return orders;
+    } catch (error) {
+      throw new Error("Error fetching user orders");
+    }
+  }
+
+  //Admin method to get all orders
+  async getAllOrders() {
+    try {
+      const orderRepo = AppDataSource.getRepository(Order);
+      const orders = await orderRepo.find({
+        relations: ["user", "orderLines", "orderLines.product"],
+      });
+      return orders;
+    } catch (error) {
+      throw new Error("Error fetching all orders");
+    }
+  }
+
+  //Vendor method to get products on orders
+  async getVendorProductsOnOrders(vendorId: string) {
+    try {
+      const productRepo = AppDataSource.getRepository(Product);
+      const products = await productRepo.find({
+        where: { vendor: { id: vendorId } },
+        relations: ["orderLines", "orderLines.order"],
+      });
+      return products;
+    } catch (error) {
+      throw new Error("Error fetching orders");
     }
   }
 }
