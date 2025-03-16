@@ -102,6 +102,36 @@ const updateOrderLineQuantity = async (
   } catch (error) {
     next(error);
   }
+
+  
+const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const orders = await orderService.getAllOrders();
+    res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getVendorProductsOnOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user || req.user.role !== "vendor") {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const { vendorId } = req.params;
+    const products = await orderService.getVendorProductsOnOrders(vendorId);
+    res.status(200).json(products);
+  } catch (error) {
+    next(error);
+  }
+};
 };
 
 export {
