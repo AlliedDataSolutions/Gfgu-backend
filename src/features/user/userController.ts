@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "./UserService";
 
-const userService = new UserService();
+
 
 const userProfile = async (req: Request, res: Response, next: NextFunction) => {
+  const userService = new UserService();
   try {
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });

@@ -10,6 +10,16 @@ A multivendor app. This is the backend repo
 
 ### Run app
 
+#### Run development (Recommended)
+
+You can development locally using:
+
+```javascript
+
+npm run dev
+
+```
+
 #### Run local
 
 Make sure to have docker running on you computer, then run the code below
@@ -29,13 +39,7 @@ docker compose up
 server should be running on: 
 http://localhost:13000/
 
-#### Run development
 
-```javascript
-
-npm run dev
-
-```
 
 ## Project structure
 Project is feature-base structured. Here is an example 
