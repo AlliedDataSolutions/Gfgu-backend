@@ -94,7 +94,7 @@ const getAllOrders = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const orders = await orderService.getAllOrders();
-    res.status(200).json(orders);
+    res.status(200).json("Orders retrieved successfully");
   } catch (error) {
     next(error);
   }
@@ -102,14 +102,17 @@ const getAllOrders = async (req: Request, res: Response, next: NextFunction) => 
 
 const getVendorProductsOnOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user || req.user.role !== "vendor") {
+    const { vendorId } = req.params;
+    const userRole = req.user?.role;
+
+    // Allow both admins and vendors to access this route
+    if (!req.user || (userRole !== "vendor" && userRole !== "admin")) {
       res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
-    const { vendorId } = req.params;
     const products = await orderService.getVendorProductsOnOrders(vendorId);
-    res.status(200).json(products);
+    res.status(200).json("Products retrieved successfully");
   } catch (error) {
     next(error);
   }
