@@ -12,57 +12,67 @@ export class OrderService {
       const productRepo = AppDataSource.getRepository(Product);
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
-
+  
       // Ensure user exists
       const user = await userRepo.findOne({ where: { id: userId } });
       if (!user) {
         throw new Error("User not found");
       }
-
+  
       // Ensure product exists
-      const product = await productRepo.findOne({ where: { id: productId }, relations: ["vendor"] });
+      const product = await productRepo.findOne({
+        where: { id: productId },
+        relations: ["vendor"],
+      });
       if (!product) {
         throw new Error("Product not found");
       }
-
+  
       // Retrieve vendor from product
       const vendor = product.vendor;
-
+  
       // Find or create order
       let order = await orderRepo.findOne({
         where: { user, status: OrderStatus.pending },
         relations: ["orderLines", "orderLines.product"],
       });
+  
       if (!order) {
         order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] });
+        await orderRepo.save(order); // 🔴 FIX: Save order first so it gets an ID
       }
-
+  
       // Ensure orderLines is initialized
       if (!order.orderLines) {
         order.orderLines = [];
       }
-
+  
       // Find or create order line
-      let orderLine = order.orderLines.find(
-        (line) => line.product.id === productId
-      );
+      let orderLine = order.orderLines.find((line) => line.product.id === productId);
       if (orderLine) {
         orderLine.quantity += quantity;
       } else {
-        orderLine = orderLineRepo.create({ product, quantity, unitPrice: product.price, vendor });
-        orderLine.order = order; // Ensure the order is set on the order line
+        orderLine = orderLineRepo.create({
+          product,
+          quantity,
+          unitPrice: product.price,
+          vendor,
+          order, // 🔴 FIX: Now linking to the already saved order.
+        });
         order.orderLines.push(orderLine);
       }
-
+  
       // Save order and order line
       await orderLineRepo.save(orderLine);
       await orderRepo.save(order);
-
+  
       return order;
     } catch (error) {
+      console.error("Error adding order line:", error);
       throw new Error("Error adding order line");
     }
   }
+  
 
   async getOrder(userId: string) {
     try {
@@ -204,16 +214,27 @@ export class OrderService {
   }
 
   //Vendor method to get products on orders
-  async getVendorProductsOnOrders(vendorId: string) {
+  async getVendorOrders(vendorId: string, page: number, limit: number) {
     try {
-      const productRepo = AppDataSource.getRepository(Product);
-      const products = await productRepo.find({
-        where: { vendor: { id: vendorId } },
-        relations: ["orderLines", "orderLines.order"],
-      });
-      return products;
+      const orderRepo = AppDataSource.getRepository(Order);
+  
+      // Updated query to properly join products with vendor
+      const [orders, count] = await orderRepo
+        .createQueryBuilder("order")
+        .leftJoinAndSelect("order.orderLines", "orderLine")
+        .leftJoinAndSelect("orderLine.product", "product") 
+        .innerJoin("product.vendor", "vendor") // 🔴 FIX: Ensure vendor relation is correctly linked
+        .where("vendor.id = :vendorId", { vendorId })
+        .orderBy("order.orderDate", "DESC") // Optional: Show newest orders first
+        .skip((page - 1) * limit)
+        .take(limit)
+        .getManyAndCount();
+  
+      return { records: orders, count };
     } catch (error) {
-      throw new Error("Error fetching orders");
+      console.error("Error in getVendorOrders:", error);
+      throw new Error("Error fetching vendor orders");
     }
   }
+  
 }
