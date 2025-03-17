@@ -63,8 +63,10 @@ export class AdminController {
         return;
       }
 
-      const orders = await this.orderService.getAllOrders();
-      res.status(200).json("Orders retrieved successfully");
+      await this.orderService.getAllOrders();
+      res.status(200).json({
+        message: "Orders retrieved successfully",
+      });
     } catch (error) {
       next(error);
     }
