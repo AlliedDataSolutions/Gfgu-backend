@@ -16,6 +16,15 @@ interface UserResponse {
   modifiedDate: Date;
 }
 
+export interface FilterUsers {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isConfirmed?: boolean;
+  account: Role[];
+  status: ConfirmationStatus[];
+}
+
 export class UserService {
   user = async (userId: string): Promise<UserResponse | null> => {
     const userRepo = AppDataSource.getRepository(User);
@@ -40,18 +49,21 @@ export class UserService {
     };
   };
 
-  async getAllUsers(
-    search?: string,
-    role?: string,
-    isConfirmed?: boolean,
-    vendorStatus?: string,
-    page: number = 1,
-    limit: number = 10
-  ) {
-    const pageNumber = Number(page);
-    const pageSize = Number(limit);
-    const skip = (pageNumber - 1) * pageSize;
+  async getAllUsers(filter: FilterUsers) {
     const userRepo = AppDataSource.getRepository(User);
+
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      isConfirmed,
+      account,
+      status,
+    } = filter;
+
+    const pageNumber = Number(page) || 1;
+    const pageSize = Number(limit) || 10;
+    const skip = (pageNumber - 1) * pageSize;
 
     let query = userRepo
       .createQueryBuilder("user")
@@ -62,31 +74,36 @@ export class UserService {
         "credential.userId = user.id"
       );
 
+    // Apply search filter if provided
     if (search) {
       query = query.andWhere(
-        "user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search",
+        "(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)",
         { search: `%${search}%` }
       );
     }
 
-    if (role) {
-      query = query.andWhere("credential.role = :role", { role });
-    }
-
-    if (isConfirmed !== undefined) {
+    // Apply confirmed filter if provided
+    if (typeof isConfirmed === "boolean") {
       query = query.andWhere("user.isConfirmed = :isConfirmed", {
         isConfirmed,
       });
     }
 
-    if (vendorStatus) {
-      query = query.andWhere("vendor.status = :vendorStatus", { vendorStatus });
+    // Apply role filter if provided
+    if (account && account.length > 0) {
+      query = query.andWhere("credential.role IN (:...account)", { account });
+    }
+
+    // Apply vendor status filter if provided
+    if (status && status.length > 0) {
+      query = query.andWhere("vendor.status IN (:...status)", { status });
     }
 
     const [users, totalCount] = await query
       .skip(skip)
       .take(pageSize)
       .getManyAndCount();
+
     return {
       totalCount,
       page: pageNumber,
@@ -115,5 +132,24 @@ export class UserService {
     vendor.status = status;
     await vendorRepo.save(vendor);
     return vendor;
+  }
+
+  async deleteUser(userId: string) {
+    const userRepo = AppDataSource.getRepository(User);
+    const credentialRepo = AppDataSource.getRepository(Credential);
+  
+    // Check if user exists
+    const user = await userRepo.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error("User not found");
+    }
+  
+    // Delete associated credentials if they exist
+    await credentialRepo.delete({ user: { id: userId } });
+  
+    // Delete the user
+    await userRepo.delete(userId);
+  
+    return { message: "User deleted successfully" };
   }
 }

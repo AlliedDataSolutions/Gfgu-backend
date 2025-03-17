@@ -1,28 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../user";
 import {OrderService} from "../order/orderService";
+import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 
 const userService = new UserService();
 const orderService = new OrderService();
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-  
   try {
-    const { search, role, isConfirmed, vendorStatus, page = 1, limit = 10 } = req.query;
-    
-    const result = await userService.getAllUsers(
-      search as string,
-      role as string,
-      isConfirmed === "true",
-      vendorStatus as string,
-      Number(page),
-      Number(limit)
-    );
-
+    const filter: FilterUsers = req.body;
+    const result = await userService.getAllUsers(filter);
     res.status(200).json(result);
-  } catch (error) {
-    console.log(error)
+  } catch (error: any) {
     next(error);
   }
 };
@@ -72,4 +62,15 @@ const getAllOrders = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export { getAllUsers, setVendorStatus, confirmUser, getAllOrders };
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+    const result = await userService.deleteUser(userId);
+    res.status(200).json(result);
+  } catch (error: any) {
+    next(error);
+  }
+};
+
+export { getAllUsers, setVendorStatus, confirmUser, deleteUser,  getAllOrders };
+
