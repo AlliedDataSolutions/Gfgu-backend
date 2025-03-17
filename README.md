@@ -12,7 +12,7 @@ A multivendor app. This is the backend repo
 
 #### Run development (Recommended)
 
-You can development locally using:
+You can run the development locally using:
 
 ```javascript
 
