@@ -5,9 +5,9 @@ import {
   removeOrderLine,
   checkoutOrder,
   updateOrderLineQuantity,
-  getAllOrders,
-  getVendorProductsOnOrders,
+  vendorOrderLine,
 } from "./orderController";
+import { authMiddleware, roleMiddleware } from "../../middlewares/authMiddleware";
 
 const router = express.Router();
 
@@ -16,7 +16,6 @@ router.get("/:userId", getOrder);
 router.post("/remove", removeOrderLine);
 router.post("/checkout", checkoutOrder);
 router.post("/update-quantity", updateOrderLineQuantity);
-router.get("/admin/all-orders", getAllOrders);
-router.get("/vendor/products-on-orders/:vendorId", getVendorProductsOnOrders);
+router.get("/vendor/vendorOrderLine/:vendorId", authMiddleware, roleMiddleware(["vendor", "admin"]), vendorOrderLine);
 
 export default router;

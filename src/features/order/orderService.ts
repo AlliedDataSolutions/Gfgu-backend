@@ -85,49 +85,36 @@ export class OrderService {
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
-      console.log(`Finding order for user: ${userId} with status pending`);
+      // Find the order for the user with pending status
       const order = await orderRepo.findOne({
         where: { user: { id: userId }, status: OrderStatus.pending },
         relations: ["orderLines"],
       });
+
       if (!order) {
-        console.error("Order not found");
         throw new Error("Order not found");
       }
 
-      // Ensure orderLines is initialized
       if (!order.orderLines) {
         order.orderLines = [];
       }
+      
+      // Find the order line
+      const orderLine = order.orderLines.find(line => line.id === orderLineId);
 
-      // Ensure orderLines is initialized
-      if (!order.orderLines) {
-        order.orderLines = [];
-      }
-      console.log(`Order lines: ${JSON.stringify(order.orderLines)}`);
-      console.log(`Finding order line with ID: ${orderLineId}`);
-      const orderLine = order.orderLines.find(
-        (line) => line.id === orderLineId
-      );
       if (!orderLine) {
-        console.error("Order line not found");
         throw new Error("Order line not found");
       }
 
       // Remove the order line
-      console.log(`Removing order line with ID: ${orderLineId}`);
       await orderLineRepo.remove(orderLine);
 
       // Update the order's orderLines array and save the order
-      order.orderLines = order.orderLines.filter(
-        (line) => line.id !== orderLineId
-      );
-      console.log(`Saving updated order for user: ${userId}`);
+      order.orderLines = order.orderLines.filter(line => line.id !== orderLineId);
       await orderRepo.save(order);
 
       return order;
     } catch (error) {
-      console.error("Error removing order line:", error);
       throw new Error("Error removing order line");
     }
   }
@@ -158,39 +145,49 @@ export class OrderService {
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
-      console.log(`Finding order line with ID: ${orderLineId}`);
+      // Find the order line
       const orderLine = await orderLineRepo.findOne({
         where: { id: orderLineId },
         relations: ["order"],
       });
 
       if (!orderLine) {
-        console.error("Order line not found");
         throw new Error("Order line not found");
       }
 
-      console.log(`Order line found: ${JSON.stringify(orderLine)}`);
-      console.log(`Verifying order for user: ${userId} with status pending`);
+      // Verify the order belongs to the user and is pending
       const order = await orderRepo.findOne({
         where: { id: orderLine.order.id, user: { id: userId }, status: OrderStatus.pending },
         relations: ["orderLines"],
       });
 
       if (!order) {
-        console.error("Order not found or does not belong to the user");
         throw new Error("Order not found or does not belong to the user");
       }
 
-      console.log(`Order verified: ${JSON.stringify(order)}`);
-      console.log(`Updating order line quantity to: ${quantity}`);
+      // Update the quantity
       orderLine.quantity = quantity;
       await orderLineRepo.save(orderLine);
 
-      console.log(`Order line updated: ${JSON.stringify(orderLine)}`);
       return orderLine;
     } catch (error) {
-      console.error("Error updating order line quantity:", error);
       throw new Error("Error updating order line quantity");
+    }
+  }
+
+  //Vendor method to get products on orders
+  async vendorOrderLine(vendorId: string) {
+    try {
+      const productRepo = AppDataSource.getRepository(Product);
+
+      const products = await productRepo.find({
+        where: { vendor: { id: vendorId } },
+        relations: ["orderLines", "orderLines.order"],
+      });
+
+      return products;
+    } catch (error) {
+      throw new Error("Error fetching orders");
     }
   }
 
@@ -207,17 +204,4 @@ export class OrderService {
     }
   }
 
-  //Vendor method to get products on orders
-  async getVendorProductsOnOrders(vendorId: string) {
-    try {
-      const productRepo = AppDataSource.getRepository(Product);
-      const products = await productRepo.find({
-        where: { vendor: { id: vendorId } },
-        relations: ["orderLines", "orderLines.order"],
-      });
-      return products;
-    } catch (error) {
-      throw new Error("Error fetching orders");
-    }
-  }
 }

@@ -86,33 +86,13 @@ const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFu
   }
 };
 
-const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (!req.user || req.user.role !== "admin") {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
 
-    const orders = await orderService.getAllOrders();
-    res.status(200).json("Orders retrieved successfully");
-  } catch (error) {
-    next(error);
-  }
-};
 
-const getVendorProductsOnOrders = async (req: Request, res: Response, next: NextFunction) => {
+const vendorOrderLine = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { vendorId } = req.params;
-    const userRole = req.user?.role;
-
-    // Allow both admins and vendors to access this route
-    if (!req.user || (userRole !== "vendor" && userRole !== "admin")) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
-
-    const products = await orderService.getVendorProductsOnOrders(vendorId);
-    res.status(200).json("Products retrieved successfully");
+    const products = await orderService.vendorOrderLine(vendorId);
+    res.status(200).json(products);
   } catch (error) {
     next(error);
   }
@@ -124,6 +104,5 @@ export {
   removeOrderLine,
   checkoutOrder,
   updateOrderLineQuantity,
-  getAllOrders,
-  getVendorProductsOnOrders,
+  vendorOrderLine,
 };

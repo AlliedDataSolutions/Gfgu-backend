@@ -1,8 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../user";
+import {OrderService} from "../order/orderService";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 
 const userService = new UserService();
+const orderService = new OrderService();
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   
@@ -56,4 +58,18 @@ const setVendorStatus = async (
   }
 };
 
-export { getAllUsers, setVendorStatus, confirmUser };
+const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const orders = await orderService.getAllOrders();
+    res.status(200).json("Orders retrieved successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { getAllUsers, setVendorStatus, confirmUser, getAllOrders };
