@@ -1,8 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { UserService } from "../user";
+import {OrderService} from "../order/orderService";
 import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 
 const userService = new UserService();
+const orderService = new OrderService();
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,6 +48,20 @@ const setVendorStatus = async (
   }
 };
 
+const getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.user || req.user.role !== "admin") {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const orders = await orderService.getAllOrders();
+    res.status(200).json("Orders retrieved successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
@@ -55,4 +72,5 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { getAllUsers, setVendorStatus, confirmUser, deleteUser };
+export { getAllUsers, setVendorStatus, confirmUser, deleteUser,  getAllOrders };
+
