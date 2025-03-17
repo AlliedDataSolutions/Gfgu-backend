@@ -100,6 +100,10 @@ export class OrderService {
         order.orderLines = [];
       }
 
+      // Ensure orderLines is initialized
+      if (!order.orderLines) {
+        order.orderLines = [];
+      }
       console.log(`Order lines: ${JSON.stringify(order.orderLines)}`);
       console.log(`Finding order line with ID: ${orderLineId}`);
       const orderLine = order.orderLines.find(
@@ -149,40 +153,43 @@ export class OrderService {
     }
   }
 
-  async updateOrderLineQuantity(
-    userId: string,
-    orderLineId: string,
-    quantity: number
-  ) {
+  async updateOrderLineQuantity(userId: string, orderLineId: string, quantity: number) {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
-      const order = await orderRepo.findOne({
-        where: { user: { id: userId }, status: OrderStatus.pending },
-        relations: ["orderLines"],
+      console.log(`Finding order line with ID: ${orderLineId}`);
+      const orderLine = await orderLineRepo.findOne({
+        where: { id: orderLineId },
+        relations: ["order"],
       });
-      if (!order) {
-        throw new Error("Order not found");
-      }
 
-      // Ensure orderLines is initialized
-      if (!order.orderLines) {
-        order.orderLines = [];
-      }
-
-      const orderLine = order.orderLines.find(
-        (line) => line.id === orderLineId
-      );
       if (!orderLine) {
+        console.error("Order line not found");
         throw new Error("Order line not found");
       }
 
+      console.log(`Order line found: ${JSON.stringify(orderLine)}`);
+      console.log(`Verifying order for user: ${userId} with status pending`);
+      const order = await orderRepo.findOne({
+        where: { id: orderLine.order.id, user: { id: userId }, status: OrderStatus.pending },
+        relations: ["orderLines"],
+      });
+
+      if (!order) {
+        console.error("Order not found or does not belong to the user");
+        throw new Error("Order not found or does not belong to the user");
+      }
+
+      console.log(`Order verified: ${JSON.stringify(order)}`);
+      console.log(`Updating order line quantity to: ${quantity}`);
       orderLine.quantity = quantity;
       await orderLineRepo.save(orderLine);
 
+      console.log(`Order line updated: ${JSON.stringify(orderLine)}`);
       return orderLine;
     } catch (error) {
+      console.error("Error updating order line quantity:", error);
       throw new Error("Error updating order line quantity");
     }
   }

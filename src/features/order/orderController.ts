@@ -77,9 +77,11 @@ const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFu
     }
 
     const userId = req.user.id;
+    console.log(`Updating order line quantity for user: ${userId}, orderLineId: ${orderLineId}, quantity: ${quantity}`);
     const orderLine = await orderService.updateOrderLineQuantity(userId, orderLineId, quantity);
     res.status(200).json(orderLine);
   } catch (error) {
+    console.error("Error updating order line quantity:", error);
     next(error);
   }
 };
