@@ -35,9 +35,6 @@ export class Order {
   @Column({ nullable: true })
   shippedDate?: Date;
 
-  //@Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
-  //totalAmount!: number;
-
   @Column({
     type: "enum",
     enum: OrderStatus,
