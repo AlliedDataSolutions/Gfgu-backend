@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from "express";
+import { OrderService } from "../order/orderService";
 import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 
 export class AdminController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private orderService: OrderService
+  ) {}
 
   getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -52,4 +56,17 @@ export class AdminController {
     }
   };
 
+  getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user || req.user.role !== "admin") {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+
+      const orders = await this.orderService.getAllOrders();
+      res.status(200).json("Orders retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  };
 }
