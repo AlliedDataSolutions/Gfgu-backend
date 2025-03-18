@@ -6,9 +6,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Order } from "../order/";
+import { Order } from "../order/orderModel";
 import { Vendor } from "./vendorModel";
-import { Address } from "../address";
+import { Address } from "../address/addressModel";
 
 @Entity()
 export class User {
