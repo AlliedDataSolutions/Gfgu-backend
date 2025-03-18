@@ -214,31 +214,4 @@ export class OrderService {
     }
   }
 
-<<<<<<< HEAD
-  //Vendor method to get products on orders
-  async getVendorOrders(vendorId: string, page: number, limit: number) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-  
-      // Updated query to properly join products with vendor
-      const [orders, count] = await orderRepo
-        .createQueryBuilder("order")
-        .leftJoinAndSelect("order.orderLines", "orderLine")
-        .leftJoinAndSelect("orderLine.product", "product") 
-        .innerJoin("product.vendor", "vendor") // 🔴 FIX: Ensure vendor relation is correctly linked
-        .where("vendor.id = :vendorId", { vendorId })
-        .orderBy("order.orderDate", "DESC") // Optional: Show newest orders first
-        .skip((page - 1) * limit)
-        .take(limit)
-        .getManyAndCount();
-  
-      return { records: orders, count };
-    } catch (error) {
-      console.error("Error in getVendorOrders:", error);
-      throw new Error("Error fetching vendor orders");
-    }
-  }
-  
-=======
->>>>>>> main
 }
