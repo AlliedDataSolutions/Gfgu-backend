@@ -1,7 +1,7 @@
 import { User } from "./userModel";
-import { Credential } from "../auth";
+import { Credential } from "../auth/credentialModel";
 import { AppDataSource } from "../../config/db";
-import { Role } from "../auth";
+import { Role } from "../auth/role";
 import { Vendor } from "./vendorModel";
 import { ConfirmationStatus } from "./confirmationStatus";
 
