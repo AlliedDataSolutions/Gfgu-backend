@@ -40,35 +40,11 @@ const removeOrderLine = async (
   next: NextFunction
 ) => {
   try {
-    const { orderLineId } = req.body;
+    const { orderLineId } = req.params;
 
-    if (!req.user) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
-
-    const userId = req.user.id;
-    await orderService.removeOrderLine(userId, orderLineId);
+    const userId = req.user?.id;
+    await orderService.removeOrderLine(userId!, orderLineId);
     res.status(200).json({ message: "Order line removed" });
-  } catch (error) {
-    next(error);
-  }
-};
-
-const checkoutOrder = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
-
-    const userId = req.user.id;
-    const order = await orderService.checkoutOrder(userId);
-    res.status(200).json(order);
   } catch (error) {
     next(error);
   }
@@ -91,12 +67,8 @@ const updateOrderLineQuantity = async (
     console.log(
       `Updating order line quantity for user: ${userId}, orderLineId: ${orderLineId}, quantity: ${quantity}`
     );
-    const orderLine = await orderService.updateOrderLineQuantity(
-      userId,
-      orderLineId,
-      quantity
-    );
-    res.status(200).json(orderLine);
+    await orderService.updateOrderLineQuantity(userId, orderLineId, quantity);
+    res.status(200).json({ message: "Order updated" });
   } catch (error) {
     console.error("Error updating order line quantity:", error);
     next(error);
@@ -109,9 +81,9 @@ const vendorOrderLine = async (
   next: NextFunction
 ) => {
   try {
-    const { vendorId } = req.params;
-    const products = await orderService.vendorOrderLine(vendorId);
-    res.status(200).json(products);
+    const userId = req.user?.id;
+    const orderLines = await orderService.vendorOrderLine(userId);
+    res.status(200).json(orderLines);
   } catch (error) {
     next(error);
   }
@@ -121,7 +93,6 @@ export {
   addOrderLine,
   getOrder,
   removeOrderLine,
-  checkoutOrder,
   updateOrderLineQuantity,
   vendorOrderLine,
 };

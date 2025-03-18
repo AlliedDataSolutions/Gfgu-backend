@@ -8,8 +8,9 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { Order } from "./orderModel";
-import { Product } from "../product/productModel"; 
-import { Vendor } from "../user/vendorModel"; 
+import { Product } from "../product/productModel";
+import { Vendor } from "../user/vendorModel";
+import { OrderLineStatus } from "./orderStatus";
 
 @Entity("orderLine")
 export class OrderLine {
@@ -36,10 +37,17 @@ export class OrderLine {
   discountEndDate?: Date;
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: true })
-  discountAmount?: number; 
+  discountAmount?: number;
 
   @Column({ type: "decimal", precision: 10, scale: 2, nullable: false })
   unitPrice!: number;
+
+  @Column({
+    type: "enum",
+    enum: OrderLineStatus,
+    default: OrderLineStatus.pending,
+  })
+  status!: OrderLineStatus;
 
   @CreateDateColumn()
   createdDate!: Date;

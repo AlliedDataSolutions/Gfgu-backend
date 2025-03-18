@@ -4,6 +4,7 @@ import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
 import { User } from "../user/userModel";
 import { Product } from "../product/productModel";
+import { Vendor } from "../user";
 
 export class OrderService {
   async addOrderLine(userId: string, productId: string, quantity: number) {
@@ -20,7 +21,10 @@ export class OrderService {
       }
 
       // Ensure product exists
-      const product = await productRepo.findOne({ where: { id: productId }, relations: ["vendor"] });
+      const product = await productRepo.findOne({
+        where: { id: productId },
+        relations: ["vendor"],
+      });
       if (!product) {
         throw new Error("Product not found");
       }
@@ -30,11 +34,17 @@ export class OrderService {
 
       // Find or create order
       let order = await orderRepo.findOne({
-        where: { user, status: OrderStatus.pending },
+        where: { user: { id: userId }, status: OrderStatus.pending },
         relations: ["orderLines", "orderLines.product"],
       });
+
+
       if (!order) {
-        order = orderRepo.create({ user, status: OrderStatus.pending, orderLines: [] });
+        order = orderRepo.create({
+          user,
+          status: OrderStatus.pending,
+          orderLines: [],
+        });
       }
 
       // Ensure orderLines is initialized
@@ -49,7 +59,12 @@ export class OrderService {
       if (orderLine) {
         orderLine.quantity += quantity;
       } else {
-        orderLine = orderLineRepo.create({ product, quantity, unitPrice: product.price, vendor });
+        orderLine = orderLineRepo.create({
+          product,
+          quantity,
+          unitPrice: product.price,
+          vendor,
+        });
         orderLine.order = order; // Ensure the order is set on the order line
         order.orderLines.push(orderLine);
       }
@@ -117,7 +132,7 @@ export class OrderService {
       }
 
       // Remove the order line
-      await orderLineRepo.remove(orderLine);
+      await orderLineRepo.delete(orderLine);
 
       // Update the order's orderLines array and save the order
       order.orderLines = order.orderLines.filter(
@@ -131,87 +146,97 @@ export class OrderService {
     }
   }
 
-  async checkoutOrder(userId: string) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-
-      const order = await orderRepo.findOne({
-        where: { user: { id: userId }, status: OrderStatus.pending },
-        relations: ["orderLines", "orderLines.product"],
-      });
-      if (!order) {
-        throw new Error("Order not found");
-      }
-
-      order.status = OrderStatus.confirmed;
-      await orderRepo.save(order);
-
-      return order;
-    } catch (error) {
-      throw new Error("Error checking out order");
-    }
-  }
-
   async updateOrderLineQuantity(
     userId: string,
     orderLineId: string,
     quantity: number
   ) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const orderLineRepo = AppDataSource.getRepository(OrderLine);
+    const orderRepo = AppDataSource.getRepository(Order);
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
-      // Find the order line
-      const orderLine = await orderLineRepo.findOne({
-        where: { id: orderLineId },
-        relations: ["order"],
-      });
+    // Find the order line
+    const orderLine = await orderLineRepo.findOne({
+      where: { id: orderLineId },
+      relations: ["order"],
+    });
 
-      if (!orderLine) {
-        throw new Error("Order line not found");
-      }
-
-      // Verify the order belongs to the user and is pending
-      const order = await orderRepo.findOne({
-        where: {
-          id: orderLine.order.id,
-          user: { id: userId },
-          status: OrderStatus.pending,
-        },
-        relations: ["orderLines"],
-      });
-
-      if (!order) {
-        throw new Error("Order not found or does not belong to the user");
-      }
-
-      // Update the quantity
-      orderLine.quantity = quantity;
-      await orderLineRepo.save(orderLine);
-
-      return orderLine;
-    } catch (error) {
-      throw new Error("Error updating order line quantity");
+    if (!orderLine) {
+      throw new Error("Order line not found");
     }
+
+    // Verify the order belongs to the user and is pending
+    const order = await orderRepo.findOne({
+      where: {
+        id: orderLine.order.id,
+        user: { id: userId },
+        status: OrderStatus.pending,
+      },
+      relations: {
+        orderLines: {
+          product: {
+            images: true,
+          },
+          vendor: true,
+        },
+      },
+    });
+
+    if (!order) {
+      throw new Error("Order not found or does not belong to the user");
+    }
+
+    // Update the quantity
+    orderLine.quantity = quantity;
+    await orderLineRepo.save(orderLine);
+
+    // Return the full updated order
+    return order;
   }
 
   //Vendor method to get products on orders
-  async vendorOrderLine(vendorId: string) {
-    try {
-      const productRepo = AppDataSource.getRepository(Product);
+  async vendorOrderLine(userId?: string) {
+    const vendorRepo = AppDataSource.getRepository(Vendor);
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
 
-      const products = await productRepo.find({
-        where: { vendor: { id: vendorId } },
-        relations: ["orderLines", "orderLines.order"],
-      });
+    const vendor = await vendorRepo.findOne({
+      where: { user: { id: userId } },
+    });
 
-      return products;
-    } catch (error) {
-      throw new Error("Error fetching orders");
+    if (!vendor) {
+      throw new Error("Vendor not found");
     }
+
+    const orderLines = await orderLineRepo.find({
+      where: {
+        vendor: { id: vendor?.id },
+      },
+      relations: {
+        product: true, // Include product details
+      },
+    });
+
+    if (!orderLines.length) {
+      throw new Error("No order lines found for this vendor");
+    }
+
+    // Transform the response to include totalAmount
+    return orderLines.map((orderLine) => ({
+      id: orderLine.id,
+      product: {
+        id: orderLine.product.id,
+        name: orderLine.product.name,
+        description: orderLine.product.description,
+        images: orderLine.product.images,
+      },
+      quantity: orderLine.quantity,
+      unitPrice: orderLine.unitPrice,
+      status: orderLine.status,
+      totalAmount: orderLine.unitPrice * orderLine.quantity, // Calculate totalAmount
+    }));
   }
 
   //Admin method to get all orders
+  // Todo: Make the response paginated
   async getAllOrders() {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
