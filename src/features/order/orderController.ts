@@ -28,6 +28,10 @@ const getOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user?.id;
     const order = await orderService.getOrder(userId);
+    if (!order) {
+      res.status(404).json({ message: "Order not found" });
+      return;
+    }
     res.status(200).json(order);
   } catch (error) {
     next(error);
@@ -89,10 +93,21 @@ const vendorOrderLine = async (
   }
 };
 
+const clearCart = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const result = await orderService.clearCart(userId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   addOrderLine,
   getOrder,
   removeOrderLine,
   updateOrderLineQuantity,
   vendorOrderLine,
+  clearCart,
 };
