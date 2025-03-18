@@ -3,11 +3,13 @@ import { AdminController } from "../../src/features/admin/adminController";
 import { UserService } from "../../src/features/user/UserService";
 import { ConfirmationStatus } from "../../src/features/user/confirmationStatus";
 import { User } from "../../src/features/user/userModel";
+import { OrderService } from "../../src/features/order";
 
 jest.mock("../../src/features/user/UserService");
 
 describe("User Controller - Unit Tests", () => {
   let mockUserService: jest.Mocked<UserService>;
+  let mockOrderService: jest.Mocked<OrderService>;
   let adminController: AdminController;
   let mockReq: Partial<Request>;
   let mockRes: Partial<Response>;
@@ -15,7 +17,8 @@ describe("User Controller - Unit Tests", () => {
 
   beforeEach(() => {
     mockUserService = new UserService() as jest.Mocked<UserService>;
-    adminController = new AdminController(mockUserService); // Inject mock service
+    mockOrderService = new OrderService() as jest.Mocked<OrderService>;
+    adminController = new AdminController(mockUserService, mockOrderService); // Inject mock service
 
     mockReq = {};
     mockRes = {
