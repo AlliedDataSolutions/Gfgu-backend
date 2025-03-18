@@ -137,19 +137,21 @@ export class UserService {
   async deleteUser(userId: string) {
     const userRepo = AppDataSource.getRepository(User);
     const credentialRepo = AppDataSource.getRepository(Credential);
-  
+
     // Check if user exists
     const user = await userRepo.findOne({ where: { id: userId } });
     if (!user) {
       throw new Error("User not found");
     }
-  
+
     // Delete associated credentials if they exist
     await credentialRepo.delete({ user: { id: userId } });
-  
+
     // Delete the user
     await userRepo.delete(userId);
-  
+
     return { message: "User deleted successfully" };
   }
 }
+
+export default UserService;

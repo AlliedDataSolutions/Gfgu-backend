@@ -12,7 +12,7 @@ import { authMiddleware, roleMiddleware } from "../../middlewares/authMiddleware
 const router = express.Router();
 
 router.post("/add", addOrderLine);
-router.get("/:userId", getOrder);
+router.get("/", getOrder);
 router.post("/remove", removeOrderLine);
 router.post("/checkout", checkoutOrder);
 router.post("/update-quantity", updateOrderLineQuantity);

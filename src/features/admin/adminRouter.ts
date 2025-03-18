@@ -1,18 +1,18 @@
 import express from "express";
-import {
-  getAllUsers,
-  confirmUser,
-  setVendorStatus,
-  deleteUser,
-  getAllOrders,
-} from "./adminController";
+import { AdminController } from "./adminController";
+import UserService from "../user/UserService";
+import { OrderService } from "../order";
+
+const userService = new UserService();
+const orderService = new OrderService();
+const adminController = new AdminController(userService, orderService);
 
 const router = express.Router();
 
-router.put("/users/:userId/confirm", confirmUser);
-router.put("/users/:userId/vendor-status", setVendorStatus);
-router.get("/users", getAllUsers);
-router.get("/all-orders", getAllOrders);
-router.delete("/users/:userId/delete", deleteUser);
+router.put("/users/:userId/confirm", adminController.confirmUser);
+router.put("/users/:userId/vendor-status", adminController.setVendorStatus);
+router.post("/users", adminController.getAllUsers);
+router.delete("/users/:userId/delete", adminController.deleteUser);
+router.get("/all-orders", adminController.getAllOrders);
 
 export default router;

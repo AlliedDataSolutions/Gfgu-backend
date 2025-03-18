@@ -3,7 +3,11 @@ import { OrderService } from "./orderService";
 
 const orderService = new OrderService();
 
-const addOrderLine = async (req: Request, res: Response, next: NextFunction) => {
+const addOrderLine = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { productId, quantity } = req.body;
 
@@ -22,20 +26,19 @@ const addOrderLine = async (req: Request, res: Response, next: NextFunction) => 
 
 const getOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ message: "Unauthorized" });
-      return;
-    }
-
-    const userId = req.user.id;
+    const userId = req.user?.id;
     const order = await orderService.getOrder(userId);
-    res.status(200).json({ message: "Order Retrieved" });
+    res.status(200).json(order);
   } catch (error) {
     next(error);
   }
 };
 
-const removeOrderLine = async (req: Request, res: Response, next: NextFunction) => {
+const removeOrderLine = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orderLineId } = req.body;
 
@@ -52,7 +55,11 @@ const removeOrderLine = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-const checkoutOrder = async (req: Request, res: Response, next: NextFunction) => {
+const checkoutOrder = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.user) {
       res.status(401).json({ message: "Unauthorized" });
@@ -67,7 +74,11 @@ const checkoutOrder = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFunction) => {
+const updateOrderLineQuantity = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { orderLineId, quantity } = req.body;
 
@@ -77,8 +88,14 @@ const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFu
     }
 
     const userId = req.user.id;
-    console.log(`Updating order line quantity for user: ${userId}, orderLineId: ${orderLineId}, quantity: ${quantity}`);
-    const orderLine = await orderService.updateOrderLineQuantity(userId, orderLineId, quantity);
+    console.log(
+      `Updating order line quantity for user: ${userId}, orderLineId: ${orderLineId}, quantity: ${quantity}`
+    );
+    const orderLine = await orderService.updateOrderLineQuantity(
+      userId,
+      orderLineId,
+      quantity
+    );
     res.status(200).json(orderLine);
   } catch (error) {
     console.error("Error updating order line quantity:", error);
@@ -86,9 +103,11 @@ const updateOrderLineQuantity = async (req: Request, res: Response, next: NextFu
   }
 };
 
-
-
-const vendorOrderLine = async (req: Request, res: Response, next: NextFunction) => {
+const vendorOrderLine = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { vendorId } = req.params;
     const products = await orderService.vendorOrderLine(vendorId);

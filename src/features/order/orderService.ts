@@ -74,13 +74,21 @@ export class OrderService {
   }
   
 
-  async getOrder(userId: string) {
+  async getOrder(userId?: string) {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
       const order = await orderRepo.findOne({
         where: { user: { id: userId }, status: OrderStatus.pending },
-        relations: ["orderLines", "orderLines.product"],
+        relations: {
+          orderLines: {
+            product: {
+              images: true,
+            },
+            vendor: true,
+          },
+        },
       });
+
       if (!order) {
         throw new Error("Order not found");
       }
@@ -108,9 +116,11 @@ export class OrderService {
       if (!order.orderLines) {
         order.orderLines = [];
       }
-      
+
       // Find the order line
-      const orderLine = order.orderLines.find(line => line.id === orderLineId);
+      const orderLine = order.orderLines.find(
+        (line) => line.id === orderLineId
+      );
 
       if (!orderLine) {
         throw new Error("Order line not found");
@@ -120,7 +130,9 @@ export class OrderService {
       await orderLineRepo.remove(orderLine);
 
       // Update the order's orderLines array and save the order
-      order.orderLines = order.orderLines.filter(line => line.id !== orderLineId);
+      order.orderLines = order.orderLines.filter(
+        (line) => line.id !== orderLineId
+      );
       await orderRepo.save(order);
 
       return order;
@@ -150,7 +162,11 @@ export class OrderService {
     }
   }
 
-  async updateOrderLineQuantity(userId: string, orderLineId: string, quantity: number) {
+  async updateOrderLineQuantity(
+    userId: string,
+    orderLineId: string,
+    quantity: number
+  ) {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
       const orderLineRepo = AppDataSource.getRepository(OrderLine);
@@ -167,7 +183,11 @@ export class OrderService {
 
       // Verify the order belongs to the user and is pending
       const order = await orderRepo.findOne({
-        where: { id: orderLine.order.id, user: { id: userId }, status: OrderStatus.pending },
+        where: {
+          id: orderLine.order.id,
+          user: { id: userId },
+          status: OrderStatus.pending,
+        },
         relations: ["orderLines"],
       });
 
@@ -213,5 +233,4 @@ export class OrderService {
       throw new Error("Error fetching all orders");
     }
   }
-
 }

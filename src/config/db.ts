@@ -1,11 +1,11 @@
 import { DataSource } from "typeorm";
 import { Credential } from "../features/auth/credentialModel";
 import { User } from "../features/user/userModel";
-import { Payment } from "../features/payment";
+import { Payment } from "../features/payment/paymentModel";
 import { Order, OrderLine } from "../features/order";
 import { Product, Category } from "../features/product";
 import { Image } from "../features/image";
-import { Vendor } from "../features/user";
+import { Vendor } from "../features/user/vendorModel";
 import { Address } from "../features/address";
 import config from "./config";
 
