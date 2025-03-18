@@ -1,27 +1,13 @@
 import nodemailer from "nodemailer";
 import { AppDataSource } from "../../config/db";
-import { User, Vendor } from "../user";
+import { User } from "../user/userModel";
+import { Vendor } from "../user/vendorModel";
 import { Credential } from "./credentialModel";
 import bcrypt from "bcrypt";
 import { Role } from "./role";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-// Configure nodemailer (Use a real SMTP service like SendGrid, Mailgun)
-const transporter = nodemailer.createTransport({
-  service: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
-// Generate a confirmation token
-const generateConfirmationToken = (user: User): string => {
-  return jwt.sign({ email: user.email }, process.env.JWT_SECRET as string, {
-    expiresIn: "1d",
-  });
-};
+console.log("AuthService loaded");
 
 export class AuthService {
   async register(data: any) {
@@ -146,7 +132,7 @@ export class AuthService {
   // Send confirmation email
   async sendConfirmationEmail(user: User) {
     try {
-      const token = generateConfirmationToken(user);
+      const token = this.generateConfirmationToken(user);
       const confirmUrl = `${process.env.FRONTEND_URL}/confirm-email?token=${token}`;
 
       const mailOptions = {
@@ -157,10 +143,27 @@ export class AuthService {
            <a href="${confirmUrl}">Confirm Email</a>`,
       };
 
-      const info = await transporter.sendMail(mailOptions);
+      const info = await this.transporter.sendMail(mailOptions);
       console.log("message sent", info.messageId);
     } catch (error) {
       console.log("sendConfirmationEmail fails", error);
     }
   }
+
+  // Configure nodemailer (Use a real SMTP service like SendGrid, Mailgun)
+  transporter = nodemailer.createTransport({
+    service: "sandbox.smtp.mailtrap.io",
+    port: 2525,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  // Generate a confirmation token
+  generateConfirmationToken = (user: User): string => {
+    return jwt.sign({ email: user.email }, process.env.JWT_SECRET as string, {
+      expiresIn: "1d",
+    });
+  };
 }
