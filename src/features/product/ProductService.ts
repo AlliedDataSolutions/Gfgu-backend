@@ -2,6 +2,8 @@ import { AppDataSource } from "../../config/db";
 import { Vendor } from "../user";
 import { Product } from "./productModel";
 import { Image } from "../image";
+import { Category } from "./categoryModel";
+import { In } from "typeorm";
 
 export class ProductService {
   async getProducts(
@@ -126,8 +128,11 @@ export class ProductService {
 
       // Create Image entities and associate URLs
       const images = imageUrls.map((url: string) => {
-        const image = new Image();
-        image.url = url;
+        // const image = new Image();
+        // image.url = url;
+        const image = {
+          url : url,
+        }
         return image;
       });
 
@@ -156,4 +161,85 @@ export class ProductService {
       throw new Error("Error creating product");
     }
   }
+
+
+  async updateProduct(
+    productId: string,
+    userId: string,
+    productData: {
+      name: string;
+      description: string;
+      price: number;
+      stockLevel: number;
+      imageUrls: string[];
+      categoryIds: string[];
+    }
+  ) {
+    try {
+      const { name, description, price, stockLevel, imageUrls, categoryIds } =
+        productData;
+
+      const vendorRepo = AppDataSource.getRepository(Vendor);
+      const imageRepo = AppDataSource.getRepository(Image);
+      const productRepo = AppDataSource.getRepository(Product);
+      const categoryRepo = AppDataSource.getRepository(Category);
+
+      // Ensure user is a vendor
+      const vendor = await vendorRepo.findOne({
+        where: { user: { id: userId } },
+      });
+      if (!vendor) {
+        throw new Error("Vendor not found");
+      }
+
+      if (!imageUrls || imageUrls.length === 0) {
+        throw new Error("At least one image is required");
+      }
+
+      // Create Image entities and associate URLs
+      const images = imageUrls.map((url: string) => {
+        // const image = new Image();
+        // image.url = url;
+        const image = {
+          url : url,
+        }
+        return image;
+      });
+
+      const existingProduct = await productRepo.findOne({
+        where: { id: productId },
+        relations: ["images", "categories"],
+      });
+
+      if (!existingProduct) {
+        throw new Error("Product not found");
+      }
+
+      // Save Images and Link to Product
+      const savedImages = await imageRepo.save(images);
+
+      const categories = await categoryRepo.findBy({id: In(categoryIds)});
+
+       // Update product properties
+      existingProduct.name = name;
+      existingProduct.description = description;
+      existingProduct.price = price;
+      existingProduct.stockLevel = stockLevel;
+      existingProduct.vendor = vendor;
+      existingProduct.images = savedImages;
+      existingProduct.categories = categories
+      
+      const result = await productRepo.save(existingProduct);
+
+      let message = `${name} updated successfully`;
+      return {
+        message: message,
+        data: result,
+      };
+    } catch (error) {
+      console.log("error:", error);
+      throw new Error("Error creating product");
+    }
+  }
+
 }

@@ -122,4 +122,42 @@ const createProduct = async (
   }
 };
 
-export { getAllCategory, getProducts, getProductByID, createProduct, getAllVendor };
+const updateProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {  name, description, price, stockLevel, imageUrls, categoryIds } = req.body;
+    
+    if (!req.params.id){
+      res.status(400).json({ message: "Invalid Request" });
+      return;
+    }
+
+    if (!req.user) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    // Convert price and stockLevel to numbers
+    const parsedPrice = Number(price);
+    const parsedStockLevel = Number(stockLevel);
+
+    const data = await productService.updateProduct(req.params.id,req.user.id, {
+      name,
+      description,
+      price: parsedPrice,
+      stockLevel: parsedStockLevel,
+      imageUrls,
+      categoryIds,
+    });
+
+    res.status(201).json(data);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export { getAllCategory, getProducts, getProductByID, createProduct, getAllVendor, updateProduct };
