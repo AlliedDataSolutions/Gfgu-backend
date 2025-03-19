@@ -38,7 +38,6 @@ export class OrderService {
         relations: ["orderLines", "orderLines.product"],
       });
 
-
       if (!order) {
         order = orderRepo.create({
           user,
@@ -80,27 +79,19 @@ export class OrderService {
   }
 
   async getOrder(userId?: string) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const order = await orderRepo.findOne({
-        where: { user: { id: userId }, status: OrderStatus.pending },
-        relations: {
-          orderLines: {
-            product: {
-              images: true,
-            },
-            vendor: true,
+    const orderRepo = AppDataSource.getRepository(Order);
+    const order = await orderRepo.findOne({
+      where: { user: { id: userId }, status: OrderStatus.pending },
+      relations: {
+        orderLines: {
+          product: {
+            images: true,
           },
+          vendor: true,
         },
-      });
-
-      if (!order) {
-        throw new Error("Order not found");
-      }
-      return order;
-    } catch (error) {
-      throw new Error("Error fetching order");
-    }
+      },
+    });
+    return order;
   }
 
   async removeOrderLine(userId: string, orderLineId: string) {
@@ -247,5 +238,21 @@ export class OrderService {
     } catch (error) {
       throw new Error("Error fetching all orders");
     }
+  }
+
+  async clearCart(userId?: string) {
+    const orderRepo = AppDataSource.getRepository(Order);
+
+    const order = await orderRepo.findOneBy({
+      user: { id: userId },
+      status: OrderStatus.pending,
+    });
+
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    await orderRepo.delete(order.id);
+    return { message: "Order deleted successfully" };
   }
 }
