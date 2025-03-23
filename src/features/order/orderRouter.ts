@@ -3,19 +3,23 @@ import {
   addOrderLine,
   getOrder,
   removeOrderLine,
-  checkoutOrder,
   updateOrderLineQuantity,
   vendorOrderLine,
+  clearCart,
 } from "./orderController";
-import { authMiddleware, roleMiddleware } from "../../middlewares/authMiddleware";
+import { roleMiddleware } from "../../middlewares/authMiddleware";
 
 const router = express.Router();
 
 router.post("/add", addOrderLine);
 router.get("/", getOrder);
-router.post("/remove", removeOrderLine);
-router.post("/checkout", checkoutOrder);
-router.post("/update-quantity", updateOrderLineQuantity);
-router.get("/vendor/vendorOrderLine/:vendorId", authMiddleware, roleMiddleware(["vendor", "admin"]), vendorOrderLine);
+router.delete("/remove/:orderLineId", removeOrderLine);
+router.put("/update-quantity", updateOrderLineQuantity);
+router.delete("/clear", clearCart);
+router.get(
+  "/vendor/orderline/",
+  roleMiddleware(["vendor", "admin"]),
+  vendorOrderLine
+);
 
 export default router;

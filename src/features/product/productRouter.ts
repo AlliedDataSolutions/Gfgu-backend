@@ -5,6 +5,7 @@ import {
   getProductByID,
   createProduct,
   getAllVendor,
+  updateProduct,
 } from "./productController";
 import { createProductValidation } from "./productValidation";
 import { roleMiddleware } from "../../middlewares/authMiddleware";
@@ -22,6 +23,13 @@ router.post(
   createProductValidation,
   roleMiddleware(["vendor", "admin"]),
   createProduct
+);
+
+router.put(
+  "/:id",
+  createProductValidation,
+  roleMiddleware(["vendor", "admin"]),
+  updateProduct
 );
 
 export default router;

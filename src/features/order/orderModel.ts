@@ -19,7 +19,8 @@ export class Order {
   id!: string;
 
   @OneToMany(() => OrderLine, (orderLine) => orderLine.order, {
-    cascade: true, 
+    cascade: true,
+    onDelete: "CASCADE",
   })
   orderLines?: OrderLine[];
 
@@ -27,7 +28,7 @@ export class Order {
   payment?: Payment;
 
   @CreateDateColumn()
-  orderDate!: Date; 
+  orderDate!: Date;
 
   @Column({ nullable: true })
   requiredDate!: Date;
@@ -46,5 +47,5 @@ export class Order {
     nullable: false,
     onDelete: "CASCADE",
   })
-  user!: User; 
+  user!: User;
 }
