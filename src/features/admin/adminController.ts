@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { OrderService } from "../order/orderService";
 import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
+import { OrderLineStatus } from "../order/orderStatus";
 
 export class AdminController {
   constructor(
@@ -78,6 +79,27 @@ export class AdminController {
       );
 
       res.status(200).json(orders);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateOrderLineStatus = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { orderLineId, status } = req.body;
+
+      if (!orderLineId || !status) {
+        res.status(400).json({ message: "OrderLineId and status are required" });
+        return;
+      }
+
+      if (!Object.values(OrderLineStatus).includes(status)) {
+        res.status(400).json({ message: "Invalid order line status" });
+        return;
+      }
+
+      const updatedOrderLine = await this.orderService.updateOrderLineStatus(orderLineId, status);
+      res.status(200).json(updatedOrderLine);
     } catch (error) {
       next(error);
     }

@@ -2,6 +2,7 @@ import { AppDataSource } from "../../config/db";
 import { Order } from "./orderModel";
 import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
+import { OrderLineStatus } from "./orderStatus";
 import { User } from "../user/userModel";
 import { Product } from "../product/productModel";
 import { Vendor } from "../user";
@@ -295,5 +296,23 @@ export class OrderService {
 
     await orderRepo.delete(order.id);
     return { message: "Order deleted successfully" };
+  }
+
+  async updateOrderLineStatus(orderLineId: string, status: OrderLineStatus) {
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
+    const orderLine = await orderLineRepo.findOneBy({ id: orderLineId });
+
+    if (!orderLine) {
+      throw new Error("Order line not found");
+    }
+
+    if (!Object.values(OrderLineStatus).includes(status)) {
+      throw new Error("Invalid order line status");
+    }
+
+    orderLine.status = status;
+    await orderLineRepo.save(orderLine);
+
+    return orderLine;
   }
 }
