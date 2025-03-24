@@ -227,14 +227,55 @@ export class OrderService {
   }
 
   //Admin method to get all orders
-  // Todo: Make the response paginated
-  async getAllOrders() {
+  async getAllOrders(
+    skip: number,
+    take: number,
+    productName?: string,
+    productDescription?: string,
+    vendorId?: string,
+    orderDate?: Date
+  ) {
     try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const orders = await orderRepo.find({
-        relations: ["user", "orderLines", "orderLines.product"],
-      });
-      return orders;
+      const orderLineRepo = AppDataSource.getRepository(OrderLine);
+      const queryBuilder = orderLineRepo
+        .createQueryBuilder("orderLine")
+        .leftJoinAndSelect("orderLine.order", "order")
+        .leftJoinAndSelect("orderLine.product", "product")
+        .leftJoinAndSelect("product.vendor", "vendor")
+        .select([
+          "orderLine.id", // orderLineID
+          "order.id", // OrderID
+          "product.name", // product name
+          "orderLine.quantity", // quantity
+          "order.orderDate", // orderdate
+          "orderLine.unitPrice * orderLine.quantity", // amount
+          "orderLine.status", // orderline status
+        ])
+        .skip(skip)
+        .take(take);
+
+      if (productName) {
+        queryBuilder.andWhere("product.name ILIKE :productName", {
+          productName: `%${productName}%`,
+        });
+      }
+
+      if (productDescription) {
+        queryBuilder.andWhere("product.description ILIKE :productDescription", {
+          productDescription: `%${productDescription}%`,
+        });
+      }
+
+      if (vendorId) {
+        queryBuilder.andWhere("vendor.id = :vendorId", { vendorId });
+      }
+
+      if (orderDate) {
+        queryBuilder.andWhere("order.orderDate = :orderDate", { orderDate });
+      }
+
+      const [records, count] = await queryBuilder.getManyAndCount();
+      return { records, count };
     } catch (error) {
       throw new Error("Error fetching all orders");
     }

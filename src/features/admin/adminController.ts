@@ -63,10 +63,21 @@ export class AdminController {
         return;
       }
 
-      await this.orderService.getAllOrders();
-      res.status(200).json({
-        message: "Orders retrieved successfully",
-      });
+      const { page, limit, productName, productDescription, vendorId, orderDate } = req.query;
+
+      const skip = (Number(page) - 1) * Number(limit) || 0;
+      const take = Number(limit) || 10;
+
+      const orders = await this.orderService.getAllOrders(
+        skip,
+        take,
+        productName as string,
+        productDescription as string,
+        vendorId as string,
+        orderDate ? new Date(orderDate as string) : undefined
+      );
+
+      res.status(200).json(orders);
     } catch (error) {
       next(error);
     }
