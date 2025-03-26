@@ -12,6 +12,7 @@ import addressRouter from "./features/address/addressRouter";
 import { authMiddleware, roleMiddleware } from "./middlewares/authMiddleware";
 import orderRouter from "./features/order/orderRouter";
 import adminRouter from "./features/admin/adminRouter";
+import imageRouter from "./features/upload/imageRouter";
 
 const app: Application = express();
 
@@ -38,6 +39,7 @@ app.use("/api/address", authMiddleware, addressRouter);
 app.use("/api/product", authMiddleware, productRoute);
 app.use("/api/order", authMiddleware, orderRouter);
 app.use("/api/admin", authMiddleware, roleMiddleware(["admin"]), adminRouter);
+app.use("/api/upload",imageRouter)
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });
 });
