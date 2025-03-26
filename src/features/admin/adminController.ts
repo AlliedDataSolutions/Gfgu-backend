@@ -57,28 +57,29 @@ export class AdminController {
     }
   };
 
-  getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
+  getAllOrders = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      if (!req.user || req.user.role !== "admin") {
-        res.status(401).json({ message: "Unauthorized" });
-        return;
-      }
-
-      const { page, limit, productName, productDescription, vendorId, orderDate } = req.query;
-
-      const skip = (Number(page) - 1) * Number(limit) || 0;
-      const take = Number(limit) || 10;
-
-      const orders = await this.orderService.getAllOrders(
-        skip,
-        take,
+      const { skip, take, productName, productDescription, vendorId, orderDate } =
+        req.query;
+  
+      const skipNumber = skip ? parseInt(skip as string, 10) : 0;
+      const takeNumber = take ? parseInt(take as string, 10) : 10;
+      const orderDateDate = orderDate ? new Date(orderDate as string) : undefined;
+  
+      const { records, count } = await this.orderService.getAllOrders(
+        skipNumber,
+        takeNumber,
         productName as string,
         productDescription as string,
         vendorId as string,
-        orderDate ? new Date(orderDate as string) : undefined
+        orderDateDate
       );
-
-      res.status(200).json(orders);
+  
+      res.status(200).json({ records, count });
     } catch (error) {
       next(error);
     }

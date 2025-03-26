@@ -4,7 +4,6 @@ import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
 import { OrderLineStatus } from "./orderStatus";
 import { User } from "../user/userModel";
-import { FindManyOptions, Like, FindOptionsWhere } from "typeorm";
 import { Product } from "../product/productModel";
 import { Vendor } from "../user";
 
@@ -245,6 +244,8 @@ export class OrderService {
         .leftJoinAndSelect("order.orderLines", "orderLine")
         .leftJoinAndSelect("orderLine.product", "product")
         .leftJoinAndSelect("product.vendor", "vendor")
+        .leftJoinAndSelect("order.user", "user")
+        .leftJoinAndSelect("order.orderAddress", "orderAddress")
         .where("1=1"); // Dummy where clause to allow for easy appending of andWhere clauses
 
       if (productName) {
