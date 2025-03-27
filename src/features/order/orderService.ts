@@ -198,17 +198,18 @@ export class OrderService {
       throw new Error("Vendor not found");
     }
 
-    const orderLines = await orderLineRepo.find({
-      where: {
-        vendor: { id: vendor?.id },
-      },
-      relations: {
-        product: true, // Include product details
-      },
-    });
+    const orderLines = await orderLineRepo
+      .createQueryBuilder("orderLine")
+      .leftJoin("orderLine.product", "product")
+      .leftJoin("orderLine.order", "order")
+      .where("orderLine.vendor = :vendorId", { vendorId: vendor?.id })
+      .andWhere("order.status NOT IN (:...statuses)", {
+        statuses: [OrderStatus.pending, OrderStatus.canceled],
+      })
+      .getMany();
 
     if (!orderLines.length) {
-      throw new Error("No order lines found for this vendor");
+      return [];
     }
 
     // Transform the response to include totalAmount
