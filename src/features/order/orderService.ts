@@ -247,7 +247,10 @@ export class OrderService {
         .leftJoinAndSelect("product.vendor", "vendor")
         .leftJoinAndSelect("order.user", "user")
         .leftJoinAndSelect("order.orderAddress", "orderAddress")
-        .where("1=1"); // Dummy where clause to allow for easy appending of andWhere clauses
+        .where("1=1") // Dummy where clause to allow for easy appending of andWhere clauses
+        .andWhere("order.status NOT IN (:...statuses)", {
+          statuses: [OrderStatus.pending, OrderStatus.canceled],
+        });
 
       if (productName) {
         queryBuilder.andWhere("product.name ILIKE :productName", {
