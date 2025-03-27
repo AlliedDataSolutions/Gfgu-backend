@@ -71,4 +71,23 @@ export class AdminController {
       next(error);
     }
   };
+
+  updateOrderToDelivered = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      if (!req.user || req.user.role !== "admin") {
+        res.status(401).json({ message: "Unauthorized" });
+        return;
+      }
+
+      const { orderId } = req.params;
+      const result = await this.orderService.updateOrderToDelivered(orderId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

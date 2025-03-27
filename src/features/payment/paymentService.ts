@@ -1,5 +1,5 @@
 import paypal from "@paypal/checkout-server-sdk";
-import { client } from "@src/config/paypal";
+import { client } from "../../config/paypal";
 import paypalPayouts from "@paypal/payouts-sdk";
 
 export class PaymentService {

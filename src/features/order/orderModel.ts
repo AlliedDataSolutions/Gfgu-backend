@@ -1,40 +1,24 @@
 import {
-  Column,
   Entity,
-  OneToOne,
-  ManyToOne,
   PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
   OneToMany,
-  CreateDateColumn,
+  OneToOne,
 } from "typeorm";
-
 import { User } from "../user/userModel";
-import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
-import { Payment } from "../payment/";
+import { OrderStatus } from "./orderStatus";
+import { Address } from "../address/addressModel";
+import { Payment } from "../payment/paymentModel";
 
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @OneToMany(() => OrderLine, (orderLine) => orderLine.order, {
-    cascade: true,
-    onDelete: "CASCADE",
-  })
-  orderLines?: OrderLine[];
-
-  @OneToOne(() => Payment, (payment) => payment.order)
-  payment?: Payment;
-
-  @CreateDateColumn()
-  orderDate!: Date;
-
-  @Column({ nullable: true })
-  requiredDate!: Date;
-
-  @Column({ nullable: true })
-  shippedDate?: Date;
+  @ManyToOne(() => User, (user) => user.id)
+  user!: User;
 
   @Column({
     type: "enum",
@@ -43,9 +27,18 @@ export class Order {
   })
   status!: OrderStatus;
 
-  @ManyToOne(() => User, (user) => user.orders, {
-    nullable: false,
-    onDelete: "CASCADE",
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
+  orderLines!: OrderLine[];
+
+  @ManyToOne(() => Address, (address) => address.id, {
+    nullable: true,
+    onDelete: "SET NULL",
   })
-  user!: User;
+  orderAddress?: Address;
+
+  @Column({ nullable: true })
+  paypalOrderId?: string;
+
+  @OneToOne(() => Payment, (payment) => payment.order) // specify inverse side as 'order'
+  payment?: Payment;
 }
