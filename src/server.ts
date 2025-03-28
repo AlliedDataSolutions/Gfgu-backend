@@ -13,6 +13,8 @@ import { authMiddleware, roleMiddleware } from "./middlewares/authMiddleware";
 import orderRouter from "./features/order/orderRouter";
 import adminRouter from "./features/admin/adminRouter";
 import paymentRouter from "./features/payment/paymentRouter";
+import imageRouter from "./features/upload/imageRouter";
+
 
 const app: Application = express();
 
@@ -40,6 +42,7 @@ app.use("/api/product", authMiddleware, productRoute);
 app.use("/api/order", authMiddleware, orderRouter);
 app.use("/api/admin", authMiddleware, roleMiddleware(["admin"]), adminRouter);
 app.use("/api/payment", authMiddleware, paymentRouter);
+app.use("/api/upload",imageRouter)
 
 app.get("/api/test", (req: Request, res: Response) => {
   res.status(201).json({ message: "testing works" });

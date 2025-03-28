@@ -13,13 +13,29 @@ import { OrderStatus } from "./orderStatus";
 import { Address } from "../address/addressModel";
 import { Payment } from "../payment/paymentModel";
 
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @ManyToOne(() => User, (user) => user.id)
-  user!: User;
+  @OneToMany(() => OrderLine, (orderLine) => orderLine.order, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
+  orderLines?: OrderLine[];
+
+  @OneToOne(() => Payment, (payment) => payment.order)
+  payment?: Payment;
+
+  @CreateDateColumn()
+  orderDate!: Date;
+
+  @Column({ nullable: true })
+  requiredDate!: Date;
+
+  @Column({ nullable: true })
+  shippedDate?: Date;
 
   @Column({
     type: "enum",
@@ -28,8 +44,11 @@ export class Order {
   })
   status!: OrderStatus;
 
-  @OneToMany(() => OrderLine, (orderLine) => orderLine.order)
-  orderLines!: OrderLine[];
+  @ManyToOne(() => User, (user) => user.orders, {
+    nullable: false,
+    onDelete: "CASCADE",
+  })
+  user!: User;
 
   @ManyToOne(() => Address, (address) => address.id, {
     nullable: true,
@@ -39,7 +58,4 @@ export class Order {
 
   @Column({ nullable: true })
   paypalOrderId?: string;
-
-  @OneToOne(() => Payment, (payment) => payment.order) // specify inverse side as 'order'
-  payment?: Payment;
 }
