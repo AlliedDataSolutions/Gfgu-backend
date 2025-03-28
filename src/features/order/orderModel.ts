@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  CreateDateColumn,
 } from "typeorm";
 import { User } from "../user/userModel";
 import { OrderLine } from "./orderLineModel";

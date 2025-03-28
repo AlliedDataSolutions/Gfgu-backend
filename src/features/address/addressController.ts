@@ -33,10 +33,11 @@ export const addUserAddress = async (req: Request, res: Response) => {
       return;
     }
     // Only extract the fields that exist in the Address entity
-    const { streetName, city, province, postalCode } = req.body;
+    const { streetName, city, province, postalCode, addressType } = req.body;
     const addressRepo = AppDataSource.getRepository(Address);
     // Map the incoming 'city' to the entity's 'town'
     const newAddress = addressRepo.create({
+      addressType,
       streetName,
       town: city, // Correct mapping
       province,
