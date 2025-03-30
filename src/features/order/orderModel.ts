@@ -12,6 +12,7 @@ import { User } from "../user/userModel";
 import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
 import { Payment } from "../payment/";
+import { Address } from "../address/addressModel";
 
 @Entity()
 export class Order {
@@ -48,4 +49,10 @@ export class Order {
     onDelete: "CASCADE",
   })
   user!: User;
+
+  @ManyToOne(() => Address, (address) => address.id, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
+  orderAddress?: Address;
 }

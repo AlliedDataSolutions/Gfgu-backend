@@ -2,6 +2,7 @@ import { AppDataSource } from "../../config/db";
 import { Order } from "./orderModel";
 import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
+import { OrderLineStatus } from "./orderStatus";
 import { User } from "../user/userModel";
 import { Product } from "../product/productModel";
 import { Vendor } from "../user";
@@ -197,17 +198,18 @@ export class OrderService {
       throw new Error("Vendor not found");
     }
 
-    const orderLines = await orderLineRepo.find({
-      where: {
-        vendor: { id: vendor?.id },
-      },
-      relations: {
-        product: true, // Include product details
-      },
-    });
+    const orderLines = await orderLineRepo
+      .createQueryBuilder("orderLine")
+      .leftJoin("orderLine.product", "product")
+      .leftJoin("orderLine.order", "order")
+      .where("orderLine.vendor = :vendorId", { vendorId: vendor?.id })
+      .andWhere("order.status NOT IN (:...statuses)", {
+        statuses: [OrderStatus.pending, OrderStatus.canceled],
+      })
+      .getMany();
 
     if (!orderLines.length) {
-      throw new Error("No order lines found for this vendor");
+      return [];
     }
 
     // Transform the response to include totalAmount
@@ -227,15 +229,55 @@ export class OrderService {
   }
 
   //Admin method to get all orders
-  // Todo: Make the response paginated
-  async getAllOrders() {
+  async getAllOrders(
+    skip: number,
+    take: number,
+    productName?: string,
+    productDescription?: string,
+    vendorId?: string,
+    orderDate?: Date
+  ) {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
-      const orders = await orderRepo.find({
-        relations: ["user", "orderLines", "orderLines.product"],
-      });
-      return orders;
+
+      const queryBuilder = orderRepo
+        .createQueryBuilder("order")
+        .leftJoinAndSelect("order.orderLines", "orderLine")
+        .leftJoinAndSelect("orderLine.product", "product")
+        .leftJoinAndSelect("product.vendor", "vendor")
+        .leftJoinAndSelect("order.user", "user")
+        .leftJoinAndSelect("order.orderAddress", "orderAddress")
+        .where("1=1") // Dummy where clause to allow for easy appending of andWhere clauses
+        .andWhere("order.status NOT IN (:...statuses)", {
+          statuses: [OrderStatus.pending, OrderStatus.canceled],
+        });
+
+      if (productName) {
+        queryBuilder.andWhere("product.name ILIKE :productName", {
+          productName: `%${productName}%`,
+        });
+      }
+
+      if (productDescription) {
+        queryBuilder.andWhere("product.description ILIKE :productDescription", {
+          productDescription: `%${productDescription}%`,
+        });
+      }
+
+      if (vendorId) {
+        queryBuilder.andWhere("vendor.id = :vendorId", { vendorId });
+      }
+
+      if (orderDate) {
+        queryBuilder.andWhere("order.orderDate = :orderDate", { orderDate });
+      }
+
+      queryBuilder.skip(skip).take(take);
+
+      const [records, count] = await queryBuilder.getManyAndCount();
+      return { records, count };
     } catch (error) {
+      console.error("Error fetching all orders:", error);
       throw new Error("Error fetching all orders");
     }
   }
@@ -254,5 +296,23 @@ export class OrderService {
 
     await orderRepo.delete(order.id);
     return { message: "Order deleted successfully" };
+  }
+
+  async updateOrderLineStatus(orderLineId: string, status: OrderLineStatus) {
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
+    const orderLine = await orderLineRepo.findOneBy({ id: orderLineId });
+
+    if (!orderLine) {
+      throw new Error("Order line not found");
+    }
+
+    if (!Object.values(OrderLineStatus).includes(status)) {
+      throw new Error("Invalid order line status");
+    }
+
+    orderLine.status = status;
+    await orderLineRepo.save(orderLine);
+
+    return orderLine;
   }
 }
