@@ -50,7 +50,8 @@ export class AuthController {
         refreshToken: response.refreshToken,
       });
     } catch (error) {
-      next(error);
+      res.status(500).json(error)
+      //next(error);
     }
   };
 
