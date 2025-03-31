@@ -17,8 +17,7 @@ const userProfile = async (req: Request, res: Response, next: NextFunction) => {
     }
     res.status(200).json(userProfile);
   } catch (error) {
-    // next();
-    res.status(500).json(error)
+    next();
   }
 };
 export { userProfile };
