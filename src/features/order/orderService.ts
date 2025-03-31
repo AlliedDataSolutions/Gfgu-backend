@@ -335,6 +335,7 @@ export class OrderService {
     }
   }
 
+  // When order is delivered, vendor balance get updated
   async updateOrderToDelivered(orderId: string) {
     try {
       const orderRepo = AppDataSource.getRepository(Order);
