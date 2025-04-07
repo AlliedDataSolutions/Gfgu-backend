@@ -159,5 +159,23 @@ const updateProduct = async (
   }
 };
 
+const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      res.status(400).json({ message: "Invalid product ID" });
+      return;
+    }
+    if (!req.user) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
 
-export { getAllCategory, getProducts, getProductByID, createProduct, getAllVendor, updateProduct };
+    const response = await productService.deleteProduct(id, req.user.id, req.user.role);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { getAllCategory, getProducts, getProductByID, createProduct, getAllVendor, updateProduct, deleteProduct };

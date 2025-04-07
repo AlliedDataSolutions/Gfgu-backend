@@ -6,6 +6,7 @@ import {
   createProduct,
   getAllVendor,
   updateProduct,
+  deleteProduct
 } from "./productController";
 import { createProductValidation } from "./productValidation";
 import { roleMiddleware } from "../../middlewares/authMiddleware";
@@ -30,6 +31,12 @@ router.put(
   createProductValidation,
   roleMiddleware(["vendor", "admin"]),
   updateProduct
+);
+
+router.delete(
+  "/:id",
+  roleMiddleware(["vendor", "admin"]),
+  deleteProduct
 );
 
 export default router;

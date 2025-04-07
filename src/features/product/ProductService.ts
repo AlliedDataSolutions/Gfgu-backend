@@ -4,6 +4,7 @@ import { Product } from "./productModel";
 import { Image } from "../image";
 import { Category } from "./categoryModel";
 import { In } from "typeorm";
+import { Credential } from "../auth/credentialModel";
 
 export class ProductService {
   async getProducts(
@@ -183,13 +184,19 @@ export class ProductService {
       const imageRepo = AppDataSource.getRepository(Image);
       const productRepo = AppDataSource.getRepository(Product);
       const categoryRepo = AppDataSource.getRepository(Category);
+      const credentialRepo = AppDataSource.getRepository(Credential);
 
       // Ensure user is a vendor
       const vendor = await vendorRepo.findOne({
         where: { user: { id: userId } },
       });
       if (!vendor) {
-        throw new Error("Vendor not found");
+        const credential = await credentialRepo.findOne({
+          where: { user: { id: userId } },
+        });
+        if(!credential){
+          throw new Error("User not found");
+        }
       }
 
       if (!imageUrls || imageUrls.length === 0) {
@@ -225,7 +232,7 @@ export class ProductService {
       existingProduct.description = description;
       existingProduct.price = price;
       existingProduct.stockLevel = stockLevel;
-      existingProduct.vendor = vendor;
+      // existingProduct.vendor = vendor;
       existingProduct.images = savedImages;
       existingProduct.categories = categories
       
@@ -241,5 +248,49 @@ export class ProductService {
       throw new Error("Error creating product");
     }
   }
+
+
+  async deleteProduct(productId: string, userId: string, userRole: string) {
+    try {
+      const productRepo = AppDataSource.getRepository(Product);
+      const vendorRepo = AppDataSource.getRepository(Vendor);
+  
+      // For non-admins, verify that the user is a vendor and owns the product.
+      if (userRole !== "admin") {
+        const vendor = await vendorRepo.findOne({ where: { user: { id: userId } } });
+        if (!vendor) {
+          throw new Error("Vendor not found");
+        }
+  
+        const product = await productRepo.findOne({
+          where: { id: productId },
+          relations: ["vendor"],
+        });
+        if (!product) {
+          throw new Error("Product not found");
+        }
+  
+        if (product.vendor.id !== vendor.id) {
+          throw new Error("Unauthorized: You can only delete your own products");
+        }
+  
+        await productRepo.remove(product);
+      } else {
+        // For admin, skip vendor check.
+        const product = await productRepo.findOne({ where: { id: productId } });
+        if (!product) {
+          throw new Error("Product not found");
+        }
+        await productRepo.remove(product);
+      }
+  
+      return { message: "Product deleted successfully" };
+    } catch (error) {
+      console.error("deleteProduct error:", error);
+      throw new Error("Error deleting product");
+    }
+  }
+  
+
 
 }
