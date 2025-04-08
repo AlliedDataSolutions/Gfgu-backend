@@ -57,7 +57,7 @@ export class OrderService {
 
       // Find or create order line
       let orderLine = order.orderLines.find(
-        (line) => line.product.id === productId
+        (line) => line.product && line.product.id === productId
       );
       if (orderLine) {
         orderLine.quantity += quantity;

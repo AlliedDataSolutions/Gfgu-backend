@@ -7,9 +7,9 @@ export class PaymentController {
   // Initializes the payment, orderId is return
   createOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { orderId } = req.body;
+      const { orderId, selectedAddressId } = req.body;
       const result =
-        await this.paymentService.createPayPalOrderFromPendingOrder(orderId);
+        await this.paymentService.createPayPalOrderFromPendingOrder(orderId, selectedAddressId);
       res.status(200).json(result);
     } catch (error) {
       next(error);
