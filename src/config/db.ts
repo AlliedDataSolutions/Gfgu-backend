@@ -8,7 +8,8 @@ import { Image } from "../features/image";
 import { Vendor } from "../features/user/vendorModel";
 import { Address } from "../features/address";
 import config from "./config";
-
+import { VendorBalance } from "../features/vendor/vendorBalanceModel";
+import { Transaction } from "../features/order/transactionModel";
 
 console.log(`DB Server is running on port ${config.port}`);
 // console.log(`host:: ${config.host}`);
@@ -36,7 +37,9 @@ const AppDataSource = new DataSource({
     Category,
     OrderLine,
     Vendor,
-    Address
+    Address,
+    VendorBalance,
+    Transaction,
   ],
 });
 

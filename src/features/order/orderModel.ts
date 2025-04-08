@@ -56,6 +56,7 @@ export class Order {
   })
   orderAddress?: Address;
 
+  // The PayPal order ID (returned when initialize the order)
   @Column({ nullable: true })
   paypalOrderId?: string;
 }

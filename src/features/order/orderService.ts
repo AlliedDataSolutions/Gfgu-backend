@@ -7,6 +7,8 @@ import { User } from "../user/userModel";
 import { Product } from "../product/productModel";
 import { Vendor } from "../user";
 import { VendorBalance } from "../vendor/vendorBalanceModel";
+import { Transaction } from "./transactionModel";
+import { TransactionStatus } from "./transactionStatus";
 
 export class OrderService {
   async addOrderLine(userId: string, productId: string, quantity: number) {
@@ -76,6 +78,7 @@ export class OrderService {
 
       return order;
     } catch (error) {
+      console.log(error)
       throw new Error("Error adding order line");
     }
   }
@@ -299,6 +302,52 @@ export class OrderService {
     return { message: "Order deleted successfully" };
   }
 
+  async markOrderLineDelivered(orderLineId: string) {
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
+    const transactionRepo = AppDataSource.getRepository(Transaction);
+    const orderLine = await orderLineRepo.findOne({
+      where: { id: orderLineId },
+      relations: ["product", "product.vendor"],
+    });
+    if (!orderLine) throw new Error("OrderLine not found");
+
+    const commissionRate = 0.1; // 10%
+    const amount = orderLine.unitPrice * orderLine.quantity;
+    const commission = parseFloat(amount.toString()) * commissionRate;
+    const vendorEarnings = parseFloat(amount.toString()) - commission;
+
+    orderLine.status = OrderLineStatus.delivered;
+    orderLine.commission = commission;
+    orderLine.vendorEarnings = vendorEarnings;
+    await orderLineRepo.save(orderLine);
+
+    const vendorBalanceRepo = AppDataSource.getRepository(VendorBalance);
+    let balance = await vendorBalanceRepo.findOne({
+      where: { vendor: { id: orderLine.product.vendor.id } },
+    });
+
+    if (!balance) {
+      balance = vendorBalanceRepo.create({
+        vendor: orderLine.product.vendor,
+        totalPaid: 0,
+        pendingPayout: vendorEarnings,
+      });
+    } else {
+      balance.pendingPayout += vendorEarnings;
+    }
+    await vendorBalanceRepo.save(balance);
+
+    const transaction = transactionRepo.create({
+      vendor: orderLine.product.vendor,
+      amount: vendorEarnings,
+      type: TransactionStatus.credit,
+      orderLineId: orderLine.id,
+    });
+    await transactionRepo.save(transaction);
+    return orderLine;
+  }
+
+  //to be reviewed:
   async updateOrderLineStatus(orderLineId: string, status: OrderLineStatus) {
     const orderLineRepo = AppDataSource.getRepository(OrderLine);
     const orderLine = await orderLineRepo.findOneBy({ id: orderLineId });
@@ -315,72 +364,5 @@ export class OrderService {
     await orderLineRepo.save(orderLine);
 
     return orderLine;
-  }
-
-  async savePaypalOrderId(orderId: string, paypalOrderId: string) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const order = await orderRepo.findOne({ where: { id: orderId } });
-
-      if (!order) {
-        throw new Error("Order not found");
-      }
-
-      order.paypalOrderId = paypalOrderId;
-      await orderRepo.save(order);
-
-      return { message: "PayPal order ID saved successfully" };
-    } catch (error) {
-      throw new Error("Error saving PayPal order ID");
-    }
-  }
-
-  // When order is delivered, vendor balance get updated
-  async updateOrderToDelivered(orderId: string) {
-    try {
-      const orderRepo = AppDataSource.getRepository(Order);
-      const vendorBalanceRepo = AppDataSource.getRepository(VendorBalance);
-
-      const order = await orderRepo.findOne({
-        where: { id: orderId },
-        relations: ["orderLines", "orderLines.product", "orderLines.vendor"],
-      });
-
-      if (!order) {
-        throw new Error("Order not found");
-      }
-
-      if (order.status !== OrderStatus.confirmed) {
-        throw new Error("Order is not confirmed");
-      }
-
-      order.status = OrderStatus.delivered;
-      await orderRepo.save(order);
-
-      if (order.orderLines) {
-        for (const orderLine of order.orderLines) {
-          const vendor = orderLine.vendor;
-          const amount = orderLine.unitPrice * orderLine.quantity;
-
-          let vendorBalance = await vendorBalanceRepo.findOne({
-            where: { vendor: { id: vendor.id } },
-          });
-
-          if (!vendorBalance) {
-            vendorBalance = vendorBalanceRepo.create({
-              vendor,
-              balance: 0,
-            });
-          }
-
-          vendorBalance.balance += amount;
-          await vendorBalanceRepo.save(vendorBalance);
-        }
-      }
-
-      return { message: "Order updated to delivered" };
-    } catch (error) {
-      throw new Error("Error updating order to delivered");
-    }
   }
 }

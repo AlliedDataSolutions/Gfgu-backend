@@ -1,9 +1,11 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  ManyToOne,
   Column,
   CreateDateColumn,
+  OneToOne,
+  UpdateDateColumn,
+  JoinColumn,
 } from "typeorm";
 import { Vendor } from "../user/vendorModel";
 
@@ -12,15 +14,19 @@ export class VendorBalance {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.id)
+  @OneToOne(() => Vendor)
+  @JoinColumn()
   vendor!: Vendor;
 
-  @Column({ type: "decimal", default: 0.0 })
-  balance!: number;
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  totalPaid!: number;
 
-  @Column({ default: false })
-  isPaid!: boolean;
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  pendingPayout!: number;
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 }

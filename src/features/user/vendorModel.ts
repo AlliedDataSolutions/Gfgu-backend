@@ -11,6 +11,7 @@ import { User } from "../user/userModel";
 import { OrderLine } from "../order";
 import { Product } from "../product";
 import { VendorBalance } from "../vendor/vendorBalanceModel";
+import { Transaction } from "../order/transactionModel";
 
 @Entity()
 export class Vendor {
@@ -42,8 +43,8 @@ export class Vendor {
 
   // Each vendor has one cumulative balance record
   @OneToOne(() => VendorBalance, (balance) => balance.vendor, { cascade: true })
-  vendorBalance!: VendorBalance;
+  balance!: VendorBalance;
 
-  @OneToMany(() => VendorTransaction, (tx) => tx.vendor)
-  transactions!: VendorTransaction[];
+  @OneToMany(() => Transaction, (tx) => tx.vendor)
+  transactions!: Transaction[];
 }
