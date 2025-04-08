@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.cookies.token;
+  let token = req.header("Authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    token = req.cookies.token;
+  }
+
   if (!token) {
     res.status(401).json({ message: "Unauthorized" });
     return;

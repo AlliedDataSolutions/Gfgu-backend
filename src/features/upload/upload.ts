@@ -25,7 +25,7 @@ const handleImageUpload = async (req:Request,resp:Response, next:NextFunction) =
     throw new Error('File data or filename is missing');
   }
 
-  const uploadDir = join(cwd(), "upload");
+  const uploadDir = process.env.UPLOAD_DIR || join(cwd(), 'uploads');
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }

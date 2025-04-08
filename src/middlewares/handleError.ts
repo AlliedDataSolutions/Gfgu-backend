@@ -8,6 +8,7 @@ const handleError = (
   next: NextFunction
 ): Response | void => {
   console.error("Error caught in middleware:", err); // Debugging line
+  console.log(err)
 
   // Handle Celebrate validation errors properly
   if (isCelebrateError(err)) {
