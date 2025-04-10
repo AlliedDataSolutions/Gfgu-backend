@@ -54,4 +54,11 @@ export class OrderLine {
 
   @UpdateDateColumn()
   modifiedDate!: Date;
+
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  commission!: number;
+
+  // Vendor earnings after subtracting commission
+  @Column({ type: "decimal", precision: 10, scale: 2, default: 0 })
+  vendorEarnings!: number;
 }

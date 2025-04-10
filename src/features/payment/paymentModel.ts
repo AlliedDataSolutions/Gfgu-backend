@@ -41,7 +41,7 @@ export class Payment {
   @UpdateDateColumn()
   modifiedDate!: Date;
 
-  @OneToOne(() => Order, (order) => order.payment)
+  @OneToOne(() => Order)
   @JoinColumn()
   order!: Order;
 }

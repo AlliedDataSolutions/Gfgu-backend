@@ -10,6 +10,8 @@ import { ConfirmationStatus } from "./confirmationStatus";
 import { User } from "../user/userModel";
 import { OrderLine } from "../order";
 import { Product } from "../product";
+import { VendorBalance } from "../vendor/vendorBalanceModel";
+import { Transaction } from "../order/transactionModel";
 
 @Entity()
 export class Vendor {
@@ -38,4 +40,11 @@ export class Vendor {
     default: ConfirmationStatus.pending,
   })
   status!: ConfirmationStatus;
+
+  // Each vendor has one cumulative balance record
+  @OneToOne(() => VendorBalance, (balance) => balance.vendor, { cascade: true })
+  balance!: VendorBalance;
+
+  @OneToMany(() => Transaction, (tx) => tx.vendor)
+  transactions!: Transaction[];
 }

@@ -3,11 +3,13 @@ import { OrderService } from "../order/orderService";
 import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 import { OrderLineStatus } from "../order/orderStatus";
+import { PaymentService } from "../payment/paymentService";
 
 export class AdminController {
   constructor(
     private userService: UserService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private paymentService: PaymentService
   ) {}
 
   getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
@@ -57,19 +59,23 @@ export class AdminController {
     }
   };
 
-  getAllOrders = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  getAllOrders = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { skip, take, productName, productDescription, vendorId, orderDate } =
-        req.query;
-  
+      const {
+        skip,
+        take,
+        productName,
+        productDescription,
+        vendorId,
+        orderDate,
+      } = req.query;
+
       const skipNumber = skip ? parseInt(skip as string, 10) : 0;
       const takeNumber = take ? parseInt(take as string, 10) : 10;
-      const orderDateDate = orderDate ? new Date(orderDate as string) : undefined;
-  
+      const orderDateDate = orderDate
+        ? new Date(orderDate as string)
+        : undefined;
+
       const { records, count } = await this.orderService.getAllOrders(
         skipNumber,
         takeNumber,
@@ -78,19 +84,52 @@ export class AdminController {
         vendorId as string,
         orderDateDate
       );
-  
+
       res.status(200).json({ records, count });
     } catch (error) {
       next(error);
     }
   };
 
-  updateOrderLineStatus = async (req: Request, res: Response, next: NextFunction) => {
+  markDelivered = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { orderLineId } = req.body;
+      const updated = await this.orderService.markOrderLineDelivered(
+        orderLineId
+      );
+      res.json(updated);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  payoutVendor = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { vendorId, amount } = req.body;
+
+      const result = await this.paymentService.payoutToVendor(
+        vendorId,
+        parseFloat(amount)
+      );
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  //to be reviewed:
+  updateOrderLineStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { orderLineId, status } = req.body;
 
       if (!orderLineId || !status) {
-        res.status(400).json({ message: "OrderLineId and status are required" });
+        res
+          .status(400)
+          .json({ message: "OrderLineId and status are required" });
         return;
       }
 
@@ -99,7 +138,10 @@ export class AdminController {
         return;
       }
 
-      const updatedOrderLine = await this.orderService.updateOrderLineStatus(orderLineId, status);
+      const updatedOrderLine = await this.orderService.updateOrderLineStatus(
+        orderLineId,
+        status
+      );
       res.status(200).json(updatedOrderLine);
     } catch (error) {
       next(error);

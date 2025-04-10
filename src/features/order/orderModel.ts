@@ -1,18 +1,18 @@
 import {
-  Column,
   Entity,
-  OneToOne,
-  ManyToOne,
   PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
   OneToMany,
+  OneToOne,
   CreateDateColumn,
 } from "typeorm";
-
 import { User } from "../user/userModel";
-import { OrderStatus } from "./orderStatus";
 import { OrderLine } from "./orderLineModel";
-import { Payment } from "../payment/";
+import { OrderStatus } from "./orderStatus";
 import { Address } from "../address/addressModel";
+import { Payment } from "../payment/paymentModel";
+
 
 @Entity()
 export class Order {
@@ -55,4 +55,8 @@ export class Order {
     onDelete: "SET NULL",
   })
   orderAddress?: Address;
+
+  // The PayPal order ID (returned when initialize the order)
+  @Column({ nullable: true })
+  paypalOrderId?: string;
 }
