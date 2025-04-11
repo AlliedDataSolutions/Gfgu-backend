@@ -6,6 +6,9 @@ import { OrderLineStatus } from "./orderStatus";
 import { User } from "../user/userModel";
 import { Product } from "../product/productModel";
 import { Vendor } from "../user";
+import { VendorBalance } from "../vendor/vendorBalanceModel";
+import { Transaction } from "./transactionModel";
+import { TransactionStatus } from "./transactionStatus";
 
 export class OrderService {
   async addOrderLine(userId: string, productId: string, quantity: number) {
@@ -54,7 +57,7 @@ export class OrderService {
 
       // Find or create order line
       let orderLine = order.orderLines.find(
-        (line) => line.product.id === productId
+        (line) => line.product && line.product.id === productId
       );
       if (orderLine) {
         orderLine.quantity += quantity;
@@ -75,6 +78,7 @@ export class OrderService {
 
       return order;
     } catch (error) {
+      console.log(error)
       throw new Error("Error adding order line");
     }
   }
@@ -298,6 +302,52 @@ export class OrderService {
     return { message: "Order deleted successfully" };
   }
 
+  async markOrderLineDelivered(orderLineId: string) {
+    const orderLineRepo = AppDataSource.getRepository(OrderLine);
+    const transactionRepo = AppDataSource.getRepository(Transaction);
+    const orderLine = await orderLineRepo.findOne({
+      where: { id: orderLineId },
+      relations: ["product", "product.vendor"],
+    });
+    if (!orderLine) throw new Error("OrderLine not found");
+
+    const commissionRate = 0.1; // 10%
+    const amount = orderLine.unitPrice * orderLine.quantity;
+    const commission = parseFloat(amount.toString()) * commissionRate;
+    const vendorEarnings = parseFloat(amount.toString()) - commission;
+
+    orderLine.status = OrderLineStatus.delivered;
+    orderLine.commission = commission;
+    orderLine.vendorEarnings = vendorEarnings;
+    await orderLineRepo.save(orderLine);
+
+    const vendorBalanceRepo = AppDataSource.getRepository(VendorBalance);
+    let balance = await vendorBalanceRepo.findOne({
+      where: { vendor: { id: orderLine.product.vendor.id } },
+    });
+
+    if (!balance) {
+      balance = vendorBalanceRepo.create({
+        vendor: orderLine.product.vendor,
+        totalPaid: 0,
+        pendingPayout: vendorEarnings,
+      });
+    } else {
+      balance.pendingPayout += vendorEarnings;
+    }
+    await vendorBalanceRepo.save(balance);
+
+    const transaction = transactionRepo.create({
+      vendor: orderLine.product.vendor,
+      amount: vendorEarnings,
+      type: TransactionStatus.credit,
+      orderLineId: orderLine.id,
+    });
+    await transactionRepo.save(transaction);
+    return orderLine;
+  }
+
+  //to be reviewed:
   async updateOrderLineStatus(orderLineId: string, status: OrderLineStatus) {
     const orderLineRepo = AppDataSource.getRepository(OrderLine);
     const orderLine = await orderLineRepo.findOneBy({ id: orderLineId });

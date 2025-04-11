@@ -4,7 +4,7 @@ import { getUserAddresses, addUserAddress } from "./addressController";
 
 const router = Router();
 
-router.get("/", authMiddleware, getUserAddresses);
-router.post("/", authMiddleware, addUserAddress);
+router.get("/", getUserAddresses);
+router.post("/", addUserAddress);
 
 export default router;
