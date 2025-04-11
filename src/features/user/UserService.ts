@@ -11,6 +11,7 @@ interface UserResponse {
   lastName: string;
   email: string;
   role: Role;
+  vendorId?: string;
   phoneNumber: string | null;
   createdDate: Date;
   modifiedDate: Date;
@@ -29,7 +30,11 @@ export class UserService {
   user = async (userId: string): Promise<UserResponse | null> => {
     const userRepo = AppDataSource.getRepository(User);
     const credentialRepo = AppDataSource.getRepository(Credential);
-    const user = await userRepo.findOne({ where: { id: userId } });
+    const user = await userRepo.findOne({ 
+      where: { id: userId }, 
+      relations: [ "vendor"],
+    });
+
     if (!user) return null;
 
     const credential = await credentialRepo.findOne({
@@ -43,6 +48,7 @@ export class UserService {
       lastName: user.lastName,
       email: user.email,
       role: credential.role,
+      vendorId: user.vendor?.id,
       phoneNumber: user.phoneNumber,
       createdDate: user.createdDate,
       modifiedDate: user.modifeidDate,

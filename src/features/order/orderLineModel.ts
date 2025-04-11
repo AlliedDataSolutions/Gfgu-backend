@@ -20,7 +20,10 @@ export class OrderLine {
   @ManyToOne(() => Order, (order) => order.orderLines, { onDelete: "CASCADE" })
   order!: Order;
 
-  @ManyToOne(() => Product, (product) => product.orderLines)
+  @ManyToOne(() => Product, (product) => product.orderLines, { 
+    onDelete: "SET NULL", 
+    nullable: true 
+  })
   product!: Product;
 
   @ManyToOne(() => Vendor, (vendor) => vendor.orderLines)
