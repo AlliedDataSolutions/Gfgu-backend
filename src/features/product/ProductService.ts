@@ -205,8 +205,6 @@ export class ProductService {
 
       // Create Image entities and associate URLs
       const images = imageUrls.map((url: string) => {
-        // const image = new Image();
-        // image.url = url;
         const image = {
           url : url,
         }
