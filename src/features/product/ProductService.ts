@@ -232,7 +232,6 @@ export class ProductService {
       existingProduct.description = description;
       existingProduct.price = price;
       existingProduct.stockLevel = stockLevel;
-      // existingProduct.vendor = vendor;
       existingProduct.images = savedImages;
       existingProduct.categories = categories
       
