@@ -103,6 +103,20 @@ const clearCart = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getUserOrderHistory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?.id;
+    const orders = await orderService.getUserOrderHistory(userId);
+    res.status(200).json(orders);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   addOrderLine,
   getOrder,
@@ -110,4 +124,5 @@ export {
   updateOrderLineQuantity,
   vendorOrderLine,
   clearCart,
+  getUserOrderHistory
 };
