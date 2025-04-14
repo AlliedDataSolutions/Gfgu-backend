@@ -6,6 +6,7 @@ import {
   updateOrderLineQuantity,
   vendorOrderLine,
   clearCart,
+  getUserOrderHistory,
 } from "./orderController";
 import { roleMiddleware } from "../../middlewares/authMiddleware";
 
@@ -21,5 +22,6 @@ router.get(
   roleMiddleware(["vendor", "admin"]),
   vendorOrderLine
 );
+router.get("/history", getUserOrderHistory);
 
 export default router;

@@ -9,6 +9,7 @@ import { Vendor } from "../user";
 import { VendorBalance } from "../vendor/vendorBalanceModel";
 import { Transaction } from "./transactionModel";
 import { TransactionStatus } from "./transactionStatus";
+import { Not } from "typeorm";
 
 export class OrderService {
   async addOrderLine(userId: string, productId: string, quantity: number) {
@@ -364,5 +365,36 @@ export class OrderService {
     await orderLineRepo.save(orderLine);
 
     return orderLine;
+  }
+
+  async getUserOrderHistory(userId?: string) {
+    try {
+      const orderRepo = AppDataSource.getRepository(Order);
+      
+      const orders = await orderRepo.find({
+        where: { 
+          user: { id: userId }
+          // Include all orders, including pending ones
+        },
+        relations: {
+          orderLines: {
+            product: {
+              images: true,
+            },
+            vendor: true,
+          },
+          orderAddress: true,
+          payment: true
+        },
+        order: {
+          orderDate: "DESC" // Most recent orders first
+        }
+      });
+      
+      return orders;
+    } catch (error) {
+      console.error("Error fetching user order history:", error);
+      throw new Error("Error fetching user order history");
+    }
   }
 }
