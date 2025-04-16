@@ -8,6 +8,7 @@ import { Vendor } from "../user/vendorModel";
 import { VendorBalance } from "../vendor/vendorBalanceModel";
 import { Transaction } from "../order/transactionModel";
 import { TransactionStatus } from "../order/transactionStatus";
+import { OrderLineStatus } from "../order/orderStatus";
 import { Address } from "../address/addressModel";
 
 export class PaymentService {
@@ -132,5 +133,32 @@ export class PaymentService {
     ); // PayPal needs string
 
     return payoutResult;
+  }
+
+  async processOfflinePayment(orderId: string, selectedAddressId: string) {
+    const orderRepo = AppDataSource.getRepository(Order);
+    const addressRepo = AppDataSource.getRepository(Address);
+    const order = await orderRepo.findOne({
+      where: { id: orderId },
+      relations: ["orderLines", "orderAddress"],
+    });
+
+    if (!order) throw new Error("Order not found");
+
+    const address = await addressRepo.findOneBy({ id: selectedAddressId });
+    if (!address) throw new Error("Address not found");
+    order.orderAddress = address;
+
+    order.status = OrderStatus.offlinePayment;
+
+    if (order.orderLines) {
+      order.orderLines.forEach((orderLine) => {
+        orderLine.status = OrderLineStatus.offlinePayment;
+      });
+    }
+
+    await orderRepo.save(order);
+
+    return order;
   }
 }

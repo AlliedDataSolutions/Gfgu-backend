@@ -22,9 +22,22 @@ export class PaymentController {
       const updatedOrder = await this.paymentService.capturePayment(
         paypalOrderId
       );
-      res.json(updatedOrder);
+      res.json({updatedOrder});
     } catch (err) {
       next(err);
+    }
+  };
+
+  offlinePayment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { orderId, selectedAddressId } = req.body;
+      const updatedOrder = await this.paymentService.processOfflinePayment(
+        orderId,
+        selectedAddressId
+      );
+      res.status(200).json(updatedOrder);
+    } catch (error) {
+      next(error);
     }
   };
 }

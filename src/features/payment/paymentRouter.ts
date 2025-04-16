@@ -8,6 +8,7 @@ const paymentController = new PaymentController(paymentService);
 const router = express.Router();
 
 router.post("/init", paymentController.createOrder); //to initiate the payment i.e when paypal button clicked
-router.post("/capture-payment", paymentController.capturePayment); // 
+router.post("/capture-payment", paymentController.capturePayment); //
+router.post("/offline-pay", paymentController.offlinePayment);
 
 export default router;

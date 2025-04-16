@@ -1,5 +1,6 @@
 export enum OrderStatus {
   pending = "pending",
+  offlinePayment = "offlinePayment",
   confirmed = "confirmed",
   shipped = "shipped",
   delivered = "delivered",
@@ -8,6 +9,7 @@ export enum OrderStatus {
 
 export enum OrderLineStatus {
   pending = "pending",
+  offlinePayment = "offlinePayment",
   confirmed = "confirmed",
   shipped = "shipped",
   delivered = "delivered",
