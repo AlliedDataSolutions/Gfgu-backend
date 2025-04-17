@@ -205,7 +205,8 @@ export class OrderService {
 
     const orderLines = await orderLineRepo
       .createQueryBuilder("orderLine")
-      .leftJoin("orderLine.product", "product")
+      .leftJoinAndSelect("orderLine.product", "product")
+      .leftJoinAndSelect("product.images", "images") // Load product images
       .leftJoin("orderLine.order", "order")
       .where("orderLine.vendor = :vendorId", { vendorId: vendor?.id })
       .andWhere("order.status NOT IN (:...statuses)", {
@@ -312,7 +313,7 @@ export class OrderService {
     });
     if (!orderLine) throw new Error("OrderLine not found");
 
-    const commissionRate = 0.1; // 10%
+    const commissionRate = 0.15; // 15%
     const amount = orderLine.unitPrice * orderLine.quantity;
     const commission = parseFloat(amount.toString()) * commissionRate;
     const vendorEarnings = parseFloat(amount.toString()) - commission;
@@ -338,13 +339,23 @@ export class OrderService {
     }
     await vendorBalanceRepo.save(balance);
 
-    const transaction = transactionRepo.create({
+    const vendorTransaction = transactionRepo.create({
       vendor: orderLine.product.vendor,
       amount: vendorEarnings,
       type: TransactionStatus.credit,
+      participantType: 'vendor',
       orderLineId: orderLine.id,
     });
-    await transactionRepo.save(transaction);
+    await transactionRepo.save(vendorTransaction);
+
+    const adminTransaction = transactionRepo.create({
+      amount: commission,
+      type: TransactionStatus.credit,
+      participantType: 'admin',
+      orderLineId: orderLine.id,
+    });
+    await transactionRepo.save(adminTransaction);
+    
     return orderLine;
   }
 

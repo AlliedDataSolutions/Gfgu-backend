@@ -13,8 +13,8 @@ export class Transaction {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @ManyToOne(() => Vendor, (vendor) => vendor.transactions)
-  vendor!: Vendor;
+  @ManyToOne(() => Vendor, (vendor) => vendor.transactions, { nullable: true })
+  vendor?: Vendor;
 
   @Column({ type: "decimal", precision: 10, scale: 2 })
   amount!: number;
@@ -25,6 +25,12 @@ export class Transaction {
     enum: TransactionStatus,
   })
   type!: TransactionStatus;
+
+  @Column({ nullable: true })
+  adminId?: string;
+
+  @Column({ type: "enum", enum: ["vendor", "admin"] })
+  participantType!: "vendor" | "admin";
 
   @Column({ nullable: true })
   orderLineId?: string;

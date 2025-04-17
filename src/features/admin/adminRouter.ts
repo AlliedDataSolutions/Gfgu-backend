@@ -21,7 +21,7 @@ router.post("/users", adminController.getAllUsers);
 router.delete("/users/:userId/delete", adminController.deleteUser);
 router.get("/all-orders", adminController.getAllOrders);
 router.post("/delivered", adminController.markDelivered);
-router.post("/payout", adminController.payoutVendor);
+router.get("/transaction", adminController.getAdminTransactions);
 
 //to be reviewed:
 router.put("/update-order", adminController.updateOrderLineStatus);

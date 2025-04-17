@@ -12,7 +12,10 @@ import { OrderLineStatus } from "../order/orderStatus";
 import { Address } from "../address/addressModel";
 
 export class PaymentService {
-  async createPayPalOrderFromPendingOrder(orderId: string, selectedAddressId: string) {
+  async createPayPalOrderFromPendingOrder(
+    orderId: string,
+    selectedAddressId: string
+  ) {
     const orderRepo = AppDataSource.getRepository(Order);
     const addressRepo = AppDataSource.getRepository(Address);
     const order = await orderRepo.findOne({
@@ -102,11 +105,13 @@ export class PaymentService {
     return response.result;
   }
 
-  async payoutToVendor(vendorId: string, amount: number) {
+  async payoutToVendor(userId: string, amount: number) {
     const vendorBalanceRepo = AppDataSource.getRepository(VendorBalance);
     const transactionRepo = AppDataSource.getRepository(Transaction);
     const vendorRepo = AppDataSource.getRepository(Vendor);
-    const vendor = await vendorRepo.findOne({ where: { id: vendorId } });
+    const vendor = await vendorRepo.findOne({
+      where: { user: { id: userId } },
+    });
     if (!vendor) throw new Error("Vendor not found");
 
     let balance = await vendorBalanceRepo.findOne({
@@ -117,6 +122,16 @@ export class PaymentService {
     if (balance.pendingPayout < amount)
       throw new Error("Insufficient pending payout");
 
+    // Attempt PayPal payout first
+    const payoutResult = await this.payout(
+      vendor.user.email,
+      amount.toFixed(2)
+    );
+
+    if (payoutResult.batch_header?.batch_status !== "SUCCESS") {
+      throw new Error("PayPal payout failed");
+    }
+
     balance.pendingPayout -= amount;
     balance.totalPaid += amount;
     await vendorBalanceRepo.save(balance);
@@ -125,13 +140,9 @@ export class PaymentService {
       vendor,
       amount,
       type: TransactionStatus.debit,
+      participantType: "vendor",
     });
     await transactionRepo.save(transaction);
-    const payoutResult = await this.payout(
-      vendor.user.email,
-      amount.toFixed(2)
-    ); // PayPal needs string
-
     return payoutResult;
   }
 
@@ -160,5 +171,30 @@ export class PaymentService {
     await orderRepo.save(order);
 
     return order;
+  }
+
+  async getVendorTransactions(userId: string, skip: number, take: number) {
+    const transactionRepo = AppDataSource.getRepository(Transaction);
+    const vendorRepo = AppDataSource.getRepository(Vendor);
+    const vendor = await vendorRepo.findOne({
+      where: { user: { id: userId } },
+    });
+    const [transactions, count] = await transactionRepo.findAndCount({
+      where: { vendor: { id: vendor?.id }, participantType: "vendor" },
+      relations: ["vendor"],
+      skip,
+      take,
+    });
+    return { transactions, count };
+  }
+
+  async getAdminTransactions(skip: number, take: number) {
+    const transactionRepo = AppDataSource.getRepository(Transaction);
+    const [transactions, count] = await transactionRepo.findAndCount({
+      where: { participantType: "admin" },
+      skip,
+      take,
+    });
+    return { transactions, count };
   }
 }
