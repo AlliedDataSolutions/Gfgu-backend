@@ -173,29 +173,28 @@ export class PaymentService {
     return order;
   }
 
-  async getVendorTransactions(userId?: string) {
-    const vendorRepo = AppDataSource.getRepository(Vendor);
+  async getVendorTransactions(userId: string, skip: number, take: number) {
     const transactionRepo = AppDataSource.getRepository(Transaction);
+    const vendorRepo = AppDataSource.getRepository(Vendor);
     const vendor = await vendorRepo.findOne({
       where: { user: { id: userId } },
     });
-
-    if (!vendor) {
-      throw new Error("Vendor not found");
-    }
-
-    const transactions = await transactionRepo.find({
-      where: { vendor: { id: vendor.id }, participantType: "vendor" },
+    const [transactions, count] = await transactionRepo.findAndCount({
+      where: { vendor: { id: vendor?.id }, participantType: "vendor" },
       relations: ["vendor"],
+      skip,
+      take,
     });
-    return transactions;
+    return { transactions, count };
   }
 
-  async getAdminTransactions() {
+  async getAdminTransactions(skip: number, take: number) {
     const transactionRepo = AppDataSource.getRepository(Transaction);
-    const transactions = await transactionRepo.find({
+    const [transactions, count] = await transactionRepo.findAndCount({
       where: { participantType: "admin" },
+      skip,
+      take,
     });
-    return transactions;
+    return { transactions, count };
   }
 }

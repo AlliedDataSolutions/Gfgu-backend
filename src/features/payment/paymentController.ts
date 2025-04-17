@@ -49,7 +49,6 @@ export class PaymentController {
       const { amount } = req.body;
 
       const userId = req.user?.id;
-
       if (!userId) throw new Error("User not found");
 
       const result = await this.paymentService.payoutToVendor(
@@ -68,10 +67,22 @@ export class PaymentController {
     next: NextFunction
   ) => {
     try {
-      const transactions = await this.paymentService.getVendorTransactions(
-        req.user?.id
-      );
-      res.status(200).json(transactions);
+      const { skip, take } = req.query;
+
+      const skipNumber = skip ? parseInt(skip as string, 10) : 0;
+      const takeNumber = take ? parseInt(take as string, 10) : 10;
+
+      const userId = req.user?.id;
+      if (!userId) throw new Error("User not found");
+
+      const { transactions, count } =
+        await this.paymentService.getVendorTransactions(
+          userId,
+          skipNumber,
+          takeNumber
+        );
+
+      res.status(200).json({ transactions, count });
     } catch (error) {
       next(error);
     }

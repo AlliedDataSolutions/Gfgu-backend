@@ -140,8 +140,13 @@ export class AdminController {
     next: NextFunction
   ) => {
     try {
-      const transactions = await this.paymentService.getAdminTransactions();
-      res.status(200).json(transactions);
+      const { skip, take } = req.query;
+      const skipNumber = skip ? parseInt(skip as string, 10) : 0;
+      const takeNumber = take ? parseInt(take as string, 10) : 10;
+
+      const { transactions, count } =
+        await this.paymentService.getAdminTransactions(skipNumber, takeNumber);
+      res.status(200).json({ transactions, count });
     } catch (error) {
       next(error);
     }
