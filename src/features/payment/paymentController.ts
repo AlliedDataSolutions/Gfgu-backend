@@ -9,7 +9,10 @@ export class PaymentController {
     try {
       const { orderId, selectedAddressId } = req.body;
       const result =
-        await this.paymentService.createPayPalOrderFromPendingOrder(orderId, selectedAddressId);
+        await this.paymentService.createPayPalOrderFromPendingOrder(
+          orderId,
+          selectedAddressId
+        );
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -22,7 +25,7 @@ export class PaymentController {
       const updatedOrder = await this.paymentService.capturePayment(
         paypalOrderId
       );
-      res.json({updatedOrder});
+      res.json({ updatedOrder });
     } catch (err) {
       next(err);
     }
@@ -36,6 +39,39 @@ export class PaymentController {
         selectedAddressId
       );
       res.status(200).json(updatedOrder);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  payoutVendor = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { amount } = req.body;
+
+      const userId = req.user?.id;
+
+      if (!userId) throw new Error("User not found");
+
+      const result = await this.paymentService.payoutToVendor(
+        userId,
+        parseFloat(amount)
+      );
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  getVendorTransactions = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const transactions = await this.paymentService.getVendorTransactions(
+        req.user?.id
+      );
+      res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }

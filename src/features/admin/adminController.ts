@@ -103,20 +103,6 @@ export class AdminController {
     }
   };
 
-  payoutVendor = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { vendorId, amount } = req.body;
-
-      const result = await this.paymentService.payoutToVendor(
-        vendorId,
-        parseFloat(amount)
-      );
-      res.json(result);
-    } catch (err) {
-      next(err);
-    }
-  };
-
   //to be reviewed:
   updateOrderLineStatus = async (
     req: Request,
@@ -143,6 +129,19 @@ export class AdminController {
         status
       );
       res.status(200).json(updatedOrderLine);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getAdminTransactions = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const transactions = await this.paymentService.getAdminTransactions();
+      res.status(200).json(transactions);
     } catch (error) {
       next(error);
     }

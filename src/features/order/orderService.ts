@@ -337,13 +337,23 @@ export class OrderService {
     }
     await vendorBalanceRepo.save(balance);
 
-    const transaction = transactionRepo.create({
+    const vendorTransaction = transactionRepo.create({
       vendor: orderLine.product.vendor,
       amount: vendorEarnings,
       type: TransactionStatus.credit,
+      participantType: 'vendor',
       orderLineId: orderLine.id,
     });
-    await transactionRepo.save(transaction);
+    await transactionRepo.save(vendorTransaction);
+
+    const adminTransaction = transactionRepo.create({
+      amount: commission,
+      type: TransactionStatus.credit,
+      participantType: 'admin',
+      orderLineId: orderLine.id,
+    });
+    await transactionRepo.save(adminTransaction);
+    
     return orderLine;
   }
 
