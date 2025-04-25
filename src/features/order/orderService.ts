@@ -9,7 +9,6 @@ import { Vendor } from "../user";
 import { VendorBalance } from "../vendor/vendorBalanceModel";
 import { Transaction } from "./transactionModel";
 import { TransactionStatus } from "./transactionStatus";
-import { Not } from "typeorm";
 
 export class OrderService {
   async addOrderLine(userId: string, productId: string, quantity: number) {

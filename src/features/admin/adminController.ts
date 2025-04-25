@@ -4,6 +4,8 @@ import { FilterUsers, UserService } from "../user";
 import { ConfirmationStatus } from "../user/confirmationStatus";
 import { OrderLineStatus } from "../order/orderStatus";
 import { PaymentService } from "../payment/paymentService";
+import { Location, DeliveryDay } from "./locationModel";
+import { AppDataSource } from "../../config/db";
 
 export class AdminController {
   constructor(
@@ -147,6 +149,62 @@ export class AdminController {
       const { transactions, count } =
         await this.paymentService.getAdminTransactions(skipNumber, takeNumber);
       res.status(200).json({ transactions, count });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  createLocation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { city, deliveryday, time } = req.body;
+
+      if (!Object.values(DeliveryDay).includes(deliveryday)) {
+        res.status(400).json({ message: "Invalid delivery day" });
+        return;
+      }
+
+      const existingLocation = await AppDataSource.getRepository(
+        Location
+      ).findOne({
+        where: { city, deliveryday },
+      });
+
+      if (existingLocation) {
+        res.status(400).json({ message: "Delivery day already exists" });
+        return;
+      }
+
+      const location = new Location();
+      location.city = city;
+      location.deliveryday = deliveryday;
+      location.time = time;
+
+      await AppDataSource.getRepository(Location).save(location);
+
+      res
+        .status(201)
+        .json({ message: "Location created successfully", location });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteLocation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+
+      const location = await AppDataSource.getRepository(Location).findOne({
+        where: { id: id },
+      });
+
+      if (!location) {
+        res.status(404).json({ message: "Location not found" });
+        return;
+      }
+
+      await AppDataSource.getRepository(Location).remove(location);
+
+      res.status(200).json({ message: "Location deleted successfully" });
     } catch (error) {
       next(error);
     }
