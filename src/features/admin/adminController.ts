@@ -6,6 +6,7 @@ import { OrderLineStatus } from "../order/orderStatus";
 import { PaymentService } from "../payment/paymentService";
 import { Location, DeliveryDay } from "./locationModel";
 import { AppDataSource } from "../../config/db";
+import { ILike } from "typeorm";
 
 export class AdminController {
   constructor(
@@ -166,7 +167,7 @@ export class AdminController {
       const existingLocation = await AppDataSource.getRepository(
         Location
       ).findOne({
-        where: { city, deliveryday },
+        where: { city: ILike(city) , deliveryday },
       });
 
       if (existingLocation) {
