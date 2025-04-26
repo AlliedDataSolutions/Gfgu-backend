@@ -23,6 +23,9 @@ router.get("/all-orders", adminController.getAllOrders);
 router.post("/delivered", adminController.markDelivered);
 router.get("/transaction", adminController.getAdminTransactions);
 
+router.post("/location", adminController.createLocation);
+router.delete("/location/:id", adminController.deleteLocation);
+
 //to be reviewed:
 router.put("/update-order", adminController.updateOrderLineStatus);
 
