@@ -3,7 +3,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import "reflect-metadata";
-import { initializeDatabase } from "./config/db";
+import { AppDataSource, initializeDatabase } from "./config/db";
 import authRoute from "./features/auth/authRouter";
 import userRoute from "./features/user/userRouter";
 import productRoute from "./features/product/productRouter";
@@ -14,6 +14,7 @@ import orderRouter from "./features/order/orderRouter";
 import adminRouter from "./features/admin/adminRouter";
 import paymentRouter from "./features/payment/paymentRouter";
 import imageRouter from "./features/upload/imageRouter";
+import { Location } from "./features/admin/locationModel";
 
 const app: Application = express();
 
@@ -43,9 +44,17 @@ app.use("/api/admin", authMiddleware, roleMiddleware(["admin"]), adminRouter);
 app.use("/api/payment", authMiddleware, paymentRouter);
 app.use("/api/upload", authMiddleware, imageRouter);
 
-app.get("/api/test", (req: Request, res: Response) => {
-  res.status(201).json({ message: "testing works" });
-});
+app.use(
+  "/api/location",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const locations = await AppDataSource.getRepository(Location).find();
+      res.status(200).json(locations);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 // Custom error handler
 app.use((req: Request, res: Response, next: NextFunction) => {
