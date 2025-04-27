@@ -57,19 +57,13 @@ export class PaymentService {
     });
 
     const response = await client.execute(request);
-    console.log("PayPal createOrder response:", response);
-    console.log("orderId:", orderId);
     return { id: response.result.id }; // Send this to the frontend for PayPal button
   }
 
   async capturePayment(paypalOrderId: string) {
     const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
-    console.log("capturePayment request:", request);
     const response = await client.execute(request);
     const referenceId = response.result.purchase_units[0].reference_id;
-
-    console.log("PayPal capturePayment paypalOrderId:", paypalOrderId);
-    console.log("capturePayment response:", response);
     const updatedOrder = await this.confirmOrder(referenceId, paypalOrderId);
 
     return updatedOrder;
@@ -83,9 +77,6 @@ export class PaymentService {
 
     order.status = OrderStatus.confirmed;
     order.paypalOrderId = paypalOrderId;
-
-    console.log("confirmOrder orderId:", orderId);
-    console.log("confirmOrder paypalOrderId:", paypalOrderId);
 
     return repo.save(order);
   }
