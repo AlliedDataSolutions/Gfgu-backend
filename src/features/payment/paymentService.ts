@@ -30,7 +30,8 @@ export class PaymentService {
     await orderRepo.save(order);
 
     const totalAmount = order.orderLines?.reduce(
-      (sum, ol) => sum + parseFloat(ol.unitPrice.toString()),
+      (sum, orderLine) =>
+        sum + Number(orderLine.unitPrice) * orderLine.quantity,
       0
     );
     if (!totalAmount) {
@@ -63,7 +64,6 @@ export class PaymentService {
     const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
     const response = await client.execute(request);
     const referenceId = response.result.purchase_units[0].reference_id;
-
     const updatedOrder = await this.confirmOrder(referenceId, paypalOrderId);
 
     return updatedOrder;
