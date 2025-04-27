@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserService } from "./UserService";
 
 
+const userService = new UserService();
 
 const userProfile = async (req: Request, res: Response, next: NextFunction) => {
   const userService = new UserService();
@@ -21,3 +22,30 @@ const userProfile = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 export { userProfile };
+
+export const updateName = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { firstName, lastName } = req.body;
+    const { id } = req.user!;
+    const result = await userService.updateName(id, firstName, lastName);
+    res.json(result);
+  } catch (err) { next(err); }
+};
+
+export const updateEmail = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { newEmail } = req.body;
+    const { id } = req.user!;
+    const result = await userService.updateEmail(id, newEmail);
+    res.json(result);
+  } catch (err) { next(err); }
+};
+
+export const updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const { id } = req.user!;
+    const result = await userService.updatePassword(id, currentPassword, newPassword);
+    res.json(result);
+  } catch (err) { next(err); }
+};
