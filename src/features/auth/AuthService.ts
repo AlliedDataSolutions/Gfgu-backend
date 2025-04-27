@@ -152,7 +152,7 @@ export class AuthService {
 
   // Configure nodemailer (Use a real SMTP service like SendGrid, Mailgun)
   transporter = nodemailer.createTransport({
-    service: "sandbox.smtp.mailtrap.io",
+    host: "sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
       user: process.env.EMAIL_USER,
