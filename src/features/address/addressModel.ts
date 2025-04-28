@@ -37,6 +37,13 @@ export class Address {
   @Column({ nullable: true })
   postalCode?: string;
 
+  // New optional fields
+  @Column({ nullable: true })
+  apartment?: string;
+
+  @Column({ nullable: true })
+  phoneNumber?: string;
+
   @CreateDateColumn()
   createdDate!: Date;
 
