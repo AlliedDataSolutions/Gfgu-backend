@@ -206,7 +206,8 @@ export class OrderService {
       .createQueryBuilder("orderLine")
       .leftJoinAndSelect("orderLine.product", "product")
       .leftJoinAndSelect("product.images", "images") // Load product images
-      .leftJoin("orderLine.order", "order")
+      .leftJoinAndSelect("orderLine.order", "order")
+      .leftJoinAndSelect("order.user", "user") // Include user in the relationship
       .where("orderLine.vendor = :vendorId", { vendorId: vendor?.id })
       .andWhere("order.status NOT IN (:...statuses)", {
         statuses: [OrderStatus.pending, OrderStatus.canceled],
@@ -230,6 +231,7 @@ export class OrderService {
       unitPrice: orderLine.unitPrice,
       status: orderLine.status,
       totalAmount: orderLine.unitPrice * orderLine.quantity, // Calculate totalAmount
+      user: orderLine.order.user
     }));
   }
 
