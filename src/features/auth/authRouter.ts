@@ -9,7 +9,7 @@ const authService = new AuthService();
 const authController = new AuthController(authService);
 
 router.post("/register", registerValidation, authController.register);
-router.get("/confirm-email", authController.confirmEmail);
+router.post("/confirm-email", authController.confirmEmail);
 router.post("/login", loginValidation, authController.login);
 router.post("/logout", authController.logout);
 router.post("/refresh-token", authController.refreshToken);
