@@ -28,12 +28,13 @@ export interface FilterUsers {
 }
 
 export class UserService {
-  user = async (userId: string): Promise<UserResponse | null> => {
+  user = async (userId: string): Promise<any | null> => {
     const userRepo = AppDataSource.getRepository(User);
     const credentialRepo = AppDataSource.getRepository(Credential);
-    const user = await userRepo.findOne({ 
-      where: { id: userId }, 
-      relations: [ "vendor"],
+    const vendorRepo = AppDataSource.getRepository(Vendor);
+    const user = await userRepo.findOne({
+      where: { id: userId },
+      relations: ["vendor"],
     });
 
     if (!user) return null;
@@ -42,6 +43,23 @@ export class UserService {
       where: { user: { id: userId } },
     });
     if (!credential) return null;
+
+    let vendorDetails = {
+      businessName: "",
+      businessDescription: "",
+    };
+
+    if (user.vendor) {
+      const vendor = await vendorRepo.findOne({
+        where: { id: user.vendor.id },
+      });
+      if (vendor) {
+        vendorDetails = {
+          businessName: vendor.businessName,
+          businessDescription: vendor.businessDescription || "",
+        };
+      }
+    }
 
     return {
       id: user.id,
@@ -53,6 +71,7 @@ export class UserService {
       phoneNumber: user.phoneNumber,
       createdDate: user.createdDate,
       modifiedDate: user.modifeidDate,
+      vendor: vendorDetails,
     };
   };
 
@@ -175,35 +194,34 @@ async updateName(userId: string, firstName: string, lastName: string) {
 async updateEmail(userId: string, newEmail: string) {
   const userRepo = AppDataSource.getRepository(User);
   const credRepo = AppDataSource.getRepository(Credential);
-  const user = await userRepo.findOneBy({ id: userId });
-  if (!user) throw new Error("User not found");
-  // TODO: generate & send OTP here via nodemailer
-  user.email = newEmail;
-  await userRepo.save(user);
-  const cred = await credRepo.findOne({ where: { user: { id: userId } } });
-  if (cred) {
-    cred.email = newEmail;
-    await credRepo.save(cred);
+    const user = await userRepo.findOneBy({ id: userId });
+    if (!user) throw new Error("User not found");
+    // TODO: generate & send OTP here via nodemailer
+    user.email = newEmail;
+    await userRepo.save(user);
+    const cred = await credRepo.findOne({ where: { user: { id: userId } } });
+    if (cred) {
+      cred.email = newEmail;
+      await credRepo.save(cred);
+    }
+    return { message: "Email updated successfully", data: newEmail };
   }
-  return { message: "Email updated successfully", data: newEmail };
-}
 
-/** Change password */
-async updatePassword(
-  userId: string,
-  currentPassword: string,
-  newPassword: string
-) {
-  const credRepo = AppDataSource.getRepository(Credential);
-  const cred = await credRepo.findOne({ where: { user: { id: userId } } });
-  if (!cred) throw new Error("Credentials not found");
-  const match = await bcrypt.compare(currentPassword, cred.password);
-  if (!match) throw new Error("Current password incorrect");
-  cred.password = await bcrypt.hash(newPassword, 10);
-  await credRepo.save(cred);
-  return { message: "Password updated successfully" };
-}
+  /** Change password */
+  async updatePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string
+  ) {
+    const credRepo = AppDataSource.getRepository(Credential);
+    const cred = await credRepo.findOne({ where: { user: { id: userId } } });
+    if (!cred) throw new Error("Credentials not found");
+    const match = await bcrypt.compare(currentPassword, cred.password);
+    if (!match) throw new Error("Current password incorrect");
+    cred.password = await bcrypt.hash(newPassword, 10);
+    await credRepo.save(cred);
+    return { message: "Password updated successfully" };
+  }
 }
 
 export default UserService;
-

@@ -14,7 +14,7 @@ export class AuthController {
 
   confirmEmail = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { token } = req.query;
+      const { token } = req.body;
       if (!token || typeof token !== "string") {
         res.status(400).json({ message: "Token is required" });
         return;
