@@ -9,6 +9,7 @@ import {
   getUserOrderHistory,
 } from "./orderController";
 import { roleMiddleware } from "../../middlewares/authMiddleware";
+import { generateInvoice } from "./invoiceController";
 
 const router = express.Router();
 
@@ -23,5 +24,8 @@ router.get(
   vendorOrderLine
 );
 router.get("/history", getUserOrderHistory);
+router.get("/:orderId/invoice", (req, res, next) => {
+  generateInvoice(req, res).catch(next);
+});
 
 export default router;
