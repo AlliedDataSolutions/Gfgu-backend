@@ -230,9 +230,11 @@ export class OrderService {
       quantity: orderLine.quantity,
       unitPrice: orderLine.unitPrice,
       status: orderLine.status,
-      totalAmount: orderLine.unitPrice * orderLine.quantity, // Calculate totalAmount
+      totalAmount: orderLine.unitPrice * orderLine.quantity,
+      orderDate: orderLine.order.orderDate, // 👈 this line adds the date
       user: orderLine.order.user
     }));
+    
   }
 
   //Admin method to get all orders
