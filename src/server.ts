@@ -23,7 +23,7 @@ app.use(express.json({ limit: "2mb" })); // Adjust the limit as needed
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL,
+  "https://gfgu-frontend.vercel.app"
 ].filter(Boolean) as string[];
 
 app.use(
