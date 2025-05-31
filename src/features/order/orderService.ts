@@ -221,18 +221,25 @@ export class OrderService {
     // Transform the response to include totalAmount
     return orderLines.map((orderLine) => ({
       id: orderLine.id,
+      quantity: orderLine.quantity,
+      unitPrice: orderLine.unitPrice,
+      totalAmount: orderLine.unitPrice * orderLine.quantity,
+      status: orderLine.status,
       product: {
         id: orderLine.product.id,
         name: orderLine.product.name,
-        description: orderLine.product.description,
         images: orderLine.product.images,
       },
-      quantity: orderLine.quantity,
-      unitPrice: orderLine.unitPrice,
-      status: orderLine.status,
-      totalAmount: orderLine.unitPrice * orderLine.quantity, // Calculate totalAmount
-      user: orderLine.order.user
+      order: {
+        id: orderLine.order.id,
+        orderDate: orderLine.order.orderDate,
+        user: {
+          firstName: orderLine.order.user.firstName,
+          lastName: orderLine.order.user.lastName,
+        },
+      },
     }));
+    
   }
 
   //Admin method to get all orders
